@@ -18,3 +18,7 @@ Thumbs.db
 # Node
 node_modules/
 npm-debug.log*
+
+# VS Code 自检产物
+.git-selfcheck.txt
+.git-status.txt

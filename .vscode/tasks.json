@@ -2,14 +2,23 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Git: 自检（写入 .git-selfcheck.txt）",
+      "detail": "手动运行：验证 VS Code 能否调用 git；输出写入 .git-selfcheck.txt",
+      "type": "shell",
+      "command": "git --version > .git-selfcheck.txt 2>&1; git status --short --branch >> .git-selfcheck.txt 2>&1; git remote -v >> .git-selfcheck.txt 2>&1",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "silent", "panel": "dedicated", "clear": false }
+    },
+    {
       "label": "Git: 查看仓库状态",
-      "detail": "把 git status --short --branch 输出写到 .git-status.txt",
+      "detail": "Ctrl+Shift+B 运行。输出 git status --short --branch",
       "type": "shell",
       "command": "git status --short --branch",
       "options": { "cwd": "${workspaceFolder}" },
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
-      "group": "none"
+      "group": { "kind": "build", "isDefault": true }
     },
     {
       "label": "Git: 提交并推送",
@@ -19,7 +28,7 @@
       "options": { "cwd": "${workspaceFolder}" },
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
-      "group": { "kind": "build", "isDefault": true }
+      "group": "none"
     }
   ],
   "inputs": [
