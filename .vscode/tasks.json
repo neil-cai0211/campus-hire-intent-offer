@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Git: 查看仓库状态",
+      "detail": "把 git status --short --branch 输出写到 .git-status.txt",
+      "type": "shell",
+      "command": "git status --short --branch",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "group": "none"
+    },
+    {
+      "label": "Git: 提交并推送",
+      "detail": "git add -A → commit → push origin main",
+      "type": "shell",
+      "command": "git add -A; git commit -m \"${input:commitMessage}\"; git push origin main",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "group": { "kind": "build", "isDefault": true }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "提交信息",
+      "default": "chore: 更新 skill"
+    }
+  ]
+}
