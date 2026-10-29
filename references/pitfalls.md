@@ -106,6 +106,37 @@ bash "D:/AI-Workspace/校招审批/start-chrome.sh"   # 幂等启动脚本
 
 ## 五、系统层
 
+### VS Code 端 git 不可用（Git 面板空白）
+**症状**：项目已 `git init` 且已推送，但 VS Code 打开后「源代码管理」视图是空的 / 提示找不到 git。
+
+**根因**：VS Code 找不到 `git` 可执行文件。两个常见来源：
+1. **git 不在系统 PATH** —— 本机 git 只随 Git Bash 的 PortableGit 提供（`~/.workbuddy/binaries/PortableGit/versions/<ver>/cmd/git.exe`），Windows PATH 里没有
+2. **VS Code 进程环境变量是旧的** —— 即使后来加了 PATH，已运行的 VS Code 实例不会继承，必须完全重启
+
+**解法（两条都做）**：
+```powershell
+# 1) 建稳定入口（junction 指向版本目录，PortableGit 升级时不会失效）
+New-Item -ItemType Junction -Path "C:\Users\huiji\bin\git" `
+  -Target "C:\Users\huiji\.workbuddy\binaries\PortableGit\versions\<ver>\cmd"
+[Environment]::SetEnvironmentVariable("Path", "$userPath;C:\Users\huiji\bin\git", "User")
+
+# 2) 在 VS Code 设置里显式指定（不依赖 PATH 继承，优先级更高）
+#    %APPDATA%\Code\User\settings.json
+{ "git.path": "C:\\Users\\huiji\\bin\\git\\git.exe" }
+```
+改完 `settings.json` 后**完全重启 VS Code**（关掉所有 Code 进程再启动）。
+
+**验证**：VS Code 里按 `Ctrl+Shift+B` 跑「Git: 查看仓库状态」任务（见 `.vscode/tasks.json`），能输出分支行即通。
+
+### 用 VS Code CLI 打开目录
+✅ **用 `code <路径>` 命令**（`code.cmd` 通过 `ELECTRON_RUN_AS_NODE=1` 转发参数）。
+❌ **不要直接调 `Code.exe <路径>`** —— 会被 Electron 当成入口模块执行，报
+   `Error: Cannot find module '<路径>'`。
+❌ Git Bash 里直接调 `Code.exe` 也不行（MSYS 参数转换），报 `bad option: --verbose`。
+
+### Git Bash 里 `powershell.exe -Command` 会被拦
+报 "Invoking PowerShell from Bash bypasses PowerShell security checks" → 改用 PowerShell 工具。
+
 - **`/tmp` 不通用**：Git Bash 的 `/tmp` = `$TEMP`（即 `%LOCALAPPDATA%\Temp`），但 **Windows Python 不认 `/tmp`** → 必须给 Windows 绝对路径
 - **Windows Python 不认 MSYS 的 `/tmp`**，脚本里读该目录文件要给 `D:\AI-Workspace\...` 这种绝对路径
 - **pip 源**：清华源在本机返回 **403**，阿里源极慢 → **优先官方源 `https://pypi.org/simple`**
