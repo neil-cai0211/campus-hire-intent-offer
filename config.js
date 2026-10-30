@@ -132,4 +132,67 @@ module.exports = {
     probationMonths: 6,
     workCity: '福建福州',
   },
+
+  // ── 社招录用审批（链路一B）──────────────────────────────────────────
+  social: {
+    // 试用期月数：销售 6 个月，其他 3 个月；校招一律 6 个月
+    probationMonths: { sales: 6, default: 3, campus: 6 },
+
+    // 薪酬结构（转正前 / 转正后两套字段，比例以满额为基准）
+    // ratio 顺序：基本工资 / 保密津贴 / 绩效工资
+    payStructure: {
+      default:     { full: [80, 5, 15], prob: [80, 5, 0] },   // 通用
+      sales:       { full: [95, 5, 0],  prob: [95, 5, 0] },   // 销售线
+      brandMarketing: { full: [95, 5, 0], prob: [95, 5, 0] },  // 品牌营销线（平面设计师除外）
+    },
+    // 例外：平面设计师走通用 80/5/15
+    payExceptions: { '初级平面设计师': 'default', '中级平面设计师': 'default', '高级平面设计师': 'default', '资深平面设计师': 'default' },
+
+    // 枚举选项（实测）
+    enums: {
+      probation: ['无', '1个月', '2个月', '3个月', '4个月', '5个月', '6个月'],
+      contractSubject: ['福州誉龙智能科技有限公司', '成都先锋寰宇科技有限公司'],
+      hireType: ['首次录用', '离职返聘', '退休返聘'],
+      reportAddress: [
+        '福建省福州市鼓楼区火炬高新技术创业园1号楼',
+        '成都武侯区莱普敦中心3号楼3栋2单元1106',
+      ],
+      jobTreeCategories: ['技术', '营销', '职能', '管理', '未定义分类'],
+    },
+
+    // 工作城市（el-cascader 两级）
+    workCity: { province: '福建省', city: '福州市' },
+
+    // 报到信息默认值
+    defaults: {
+      reportAddress: '福建省福州市鼓楼区火炬高新技术创业园1号楼',
+      hireType: '首次录用',
+    },
+
+    // 岗位 → 部门映射（入职部门是自由文本框，无下拉；来源：Neil 拍板 + 花名册核对）
+    // 全路径格式：<一级部门>/<二级部门>/<三级部门>（花名册里的写法）
+    jobDeptMap: {
+      '初级实施专员': {
+        dept: '远程实施组',
+        fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组',
+        seq: '营销序列-S', rank: 'S1',
+        leader: '叶鑫(Eric Ye)',
+        pay: 'default',
+      },
+      '中级实施专员': { dept: '远程实施组', fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组', seq: '营销序列-S', rank: 'S2', pay: 'default' },
+      '高级实施专员': { dept: '远程实施组', fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组', seq: '营销序列-S', rank: 'S3', pay: 'default' },
+      '资深实施专员': { dept: '远程实施组', fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组', seq: '营销序列-S', rank: 'S4', pay: 'default' },
+    },
+
+    // 一级部门 → Leader（组织架构页 /organization/framework）
+    deptLeaders: {
+      'S&I Dpt.(战略与创新线)': 'Kevin Zhao',
+      'Sales Dpt.(销售线)': '(无负责人)',
+      'Brand Marketing Dpt.(品牌营销线)': 'Nancy Lan',
+      'CS Dpt.(客户成功线)': '信叶飞(Shawn Xin)',
+      'R&D Dpt.(产品研发线)': '张大鹏(Derek Zhang)',
+      'HR&ADM Dpt.(人力行政线)': '陈绮兰(Ivy Chen)',
+      'Finance Dpt.(财务线)': '(无负责人)',
+    },
+  },
 };
