@@ -7,7 +7,7 @@
 
 ## 卡片匹配
 
-同名多卡是常态（王彤 / 王彤德）。按**应聘职位关键字**筛，并优先选**带「录用审批」按钮**的那条。
+同名多卡是常态（例：候选人A 与一位姓名近似的候选人）。按**应聘职位关键字**筛，并优先选**带「录用审批」按钮**的那条。
 
 ## ⚠ 填写顺序（硬约束，顺序错了跑不出完整表单）
 
@@ -44,6 +44,57 @@
 填表 → 校验（关键字段 + 两个「工资合计」）→ 页脚「确定」→ 弹窗「提交审批」→ 弹窗内「确定」
 ```
 校验不通过就**中止提交**，不要带着残缺数据点确定。
+
+### 已有通用脚本（推荐直接用，别手写）
+
+`$HIRE_WORKSPACE/fill-approval-social.js` —— **参数化 + 顺序写死在代码里 + 每步带自检**。
+
+```bash
+cd "$HIRE_WORKSPACE"
+# ① 先 dry-run：填完 + 校验 + 截图，不提交
+node fill-approval-social.js <候选人配置.json>
+# ② Neil 确认后，加 --send 提交
+node fill-approval-social.js <候选人配置.json> --send
+```
+
+配置文件示例见同目录 `people-social.example.json`：
+
+```json
+{
+  "name": "<候选人姓名>",
+  "jobKeyword": "<应聘职位关键字>",
+  "position": "初级实施专员",
+  "onboardDate": "2027/07/01",
+  "probationMonths": 3,
+  "fullAmount": 4500,
+  "payKey": "default",
+  "subject": "福州誉龙智能科技有限公司",
+  "reportAddress": "福建省福州市鼓楼区火炬高新技术创业园1号楼",
+  "hireType": "首次录用",
+  "cityProvince": "福建省",
+  "city": "福州市"
+}
+```
+
+| 字段 | 说明 |
+|---|---|
+| `name` | 候选人姓名，用于卡片匹配 |
+| `jobKeyword` | 应聘职位关键字（同名多卡时区分用） |
+| `position` | **企业岗位名**，必须是 `config.js` 的 `social.jobDeptMap` 里已有的 key；没有则脚本直接中止（按规矩先问 Neil） |
+| `onboardDate` | 入职日期 `YYYY/MM/DD` |
+| `probationMonths` | 试用期月数（销售 6 / 其他 3） |
+| `fullAmount` | **转正后月收入满额**（脚本按 payKey 比例自动拆基本/保密/绩效，并算转正日期） |
+| `payKey` | `default`(80/5/15) / `sales`(95/5) / `brandMarketing`(95/5) |
+| `subject` / `reportAddress` / `hireType` / `cityProvince` / `city` | 枚举项，有默认值可省 |
+| `deptOverride` / `bossOverride` | 覆盖映射表里的部门 / Leader |
+
+**脚本内置的自检**（违反即中止，不会带着残缺数据提交）：
+- 试用期选完后，薪酬槽位**必须正好 6 个**（否则说明顺序被打乱，薪酬区没展开）
+- 两个「工资合计」必须等于按比例算出的值
+- 关键字段逐项比对（入职日期/试用期/转正日期/岗位/职级/部门/汇报对象/工作城市）
+- 入职部门必须**出现编制信息**才算真选中（不是打字进去的）
+
+**默认不提交**：不加 `--send` 就只填 + 校验 + 截图，等 Neil 确认。
 
 ## 表单字段（录用审批详情页 approval-detail）
 
@@ -99,7 +150,7 @@ inp.dispatchEvent(new Event('blur',   { bubbles: true }));
 - **转正后**：基本工资 80% + 保密津贴 5% + 绩效工资 15% = 100%
 - **转正前（试用期）**：基本工资 80% + 保密津贴 5% + **无绩效** = 85%
 
-例（王彤，转正满额 4500）：
+例（候选人A，转正满额 4500）：
 
 | 字段 | 值 | 比例 |
 |---|---|---|
@@ -132,10 +183,10 @@ inp.dispatchEvent(new Event('blur',   { bubbles: true }));
 2. **表单字段不按直觉分组**：薪资在「其他信息」区、在 `.el-form-item` 之外；入职部门是自由文本框。
 3. **入职部门要最后填**：填完后若再触发其它联动，可能被系统重算覆盖（实测选中岗位后清空过一次）。
 4. **联系人别手填**：草稿可能残留上次的值，用 JS 直接赋系统自动带出的值最稳。
-5. **同名卡片**：王彤 / 王彤德，按应聘职位 + 按钮双重匹配。
+5. **同名卡片**：按应聘职位 + 按钮双重匹配。
 6. **页面会保存草稿**：填错可以直接刷新页面重填，不用从头再来（但刷新会丢失联想组件的交互态）。
 
-## ⚠ 五个必须知道的系统行为（都实测过）
+## ⚠ 七个必须知道的系统行为（都实测过）
 
 ### 1. 入职部门必须从组织架构的树里「选」，不能打字
 
@@ -194,4 +245,22 @@ const city = p.locator('.city-list-content:visible, .select-world-city:visible')
 ```
 
 两级都要点（先省后市），点完读回确认是 `福建省/福州市`。
+
+### 6. 下拉选项有两个坑：`:visible` 匹配不到 + 动画期 height = 0
+
+Element UI 的 `el-select-dropdown__item`：
+- 用 `p.locator('.el-select-dropdown:visible .el-select-dropdown__item')` **经常匹配不到**（浮层已渲染，但样式判定为不可见）
+- 动画中间态下 `getBoundingClientRect().height === 0` ⇒ 用 `h > 8` 过滤会把选项全部排除
+
+⇒ **优先用 `p.locator('.el-select-dropdown__item').filter({hasText: text}).first().click()`**
+（Playwright 内部处理动画与可见性），失败再用底层坐标兜底（兜底时**只按 width 过滤，不能按 height**）。
+
+同理，卡片上的「录用审批」按钮 **hover 才显示**，不 hover 时 `getBoundingClientRect` 全为 0 → 取不到坐标。
+必须先 `cardLoc.hover()` 再取坐标。
+
+### 7. 部门树的节点文字可能与 fullPath 段不完全一致
+
+按 `fullPath` 逐级展开时，用**括号前的英文名做宽松匹配**（取文本最短的候选），
+不要用全段精确匹配 —— 实测 `Implementation(远程实施部)` 这种带括号的段会匹配失败。
+
 

@@ -77,13 +77,13 @@ node verify-slots.js
 3. **发送前必须停下**。offer是外发给候选人的，含薪酬数字与合同期。
 4. **只用字符级替换处理带下划线的数字**。技术模板的告知有效期原文「2026年10月23日」与入职日期原文同在文档中，用Find/Replace会串改。
 5. **推送 GitHub 前必须先自检并把「待 Neil 确认」放在最前面**。自检 7 项：脱敏、凭证扫描、私密文件已排除、脱敏后功能仍可用、commit message 有正文、仓库可见性正确、推送后验证远端。详见 [交付前确认与推送规范](references/push-protocol.md)。
-6. **社招录用审批的字段填写顺序是硬约束**。顺序错了不报错，但会跑出残缺表单（薪酬只有 3 个框 / 入职部门被清空 / 提交时字段为空）。**必须按 reference 里的 12 步顺序填**，其中三条最关键：试用期**第一个**填（否则薪酬区不展开成两套）、入职部门**最后**填（否则被联动覆盖）、填表与提交**必须一站式**（草稿不保存，刷新即丢）。详见 [链路一B 社招录用审批](references/workflow-social-approval.md)。
+6. **社招录用审批的字段填写顺序是硬约束**。顺序错了不报错，但会跑出残缺表单（薪酬只有 3 个框 / 入职部门被清空 / 提交时字段为空）。**优先用通用脚本** `fill-approval-social.js`（顺序写死在代码里 + 每步自检），别手写。手工填也必须按 reference 里的 12 步顺序，三条最关键：试用期**第一个**填（否则薪酬区不展开成两套）、入职部门**最后**填（否则被联动覆盖）、填表与提交**必须一站式**（草稿不保存，刷新即丢）。详见 [链路一B 社招录用审批](references/workflow-social-approval.md)。
 
 ## 执行位置
 
 | 内容 | 路径 |
 |---|---|
-| 工作脚本 | `D:\AI-Workspace\录用意向书\`（people.js / valid-date.js / gen-intent*.js / send-offer.js / send-all.js / make-insert-png.js / crop-pdf.js） |
+| 工作脚本 | `D:\AI-Workspace\录用意向书\`（people.js / valid-date.js / gen-intent*.js / send-offer.js / send-all.js / make-insert-png.js / crop-pdf.js / **fill-approval-social.js**（社招录用审批·参数化·顺序内置自检）） |
 | 意向书PDF | `D:\AI-Workspace\录用意向书\out\` |
 | 邮件插图 | `D:\AI-Workspace\录用意向书\out-png\`（3176宽JPEG q=90） |
 | 日志 | `D:\AI-Workspace\录用意向书\logs\` |

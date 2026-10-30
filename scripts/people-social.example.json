@@ -1,0 +1,14 @@
+{
+  "name": "<候选人姓名>",
+  "jobKeyword": "<应聘职位关键字>",
+  "position": "<企业岗位名，必须是 config.js 的 social.jobDeptMap 里已有的 key>",
+  "onboardDate": "2027/07/01",
+  "probationMonths": 3,
+  "fullAmount": 4500,
+  "payKey": "default",
+  "subject": "福州誉龙智能科技有限公司",
+  "reportAddress": "福建省福州市鼓楼区火炬高新技术创业园1号楼",
+  "hireType": "首次录用",
+  "cityProvince": "福建省",
+  "city": "福州市"
+}
