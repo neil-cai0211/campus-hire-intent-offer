@@ -9,4 +9,17 @@ module.exports = {
 
   // 要写入意向书的 HR 联系人手机号
   contactPhone: '<HR手机号>',
+
+  // 社招意向书的联系人（按合同主体自动带出的那位）
+  // 福州誉龙智能科技有限公司 → <姓名> / <电话>
+  socialContactName: '<社招联系人姓名>',
+  socialContactPhone: '<社招联系人电话>',
+
+  // 远程实施组 Leader（汇报对象）
+  socialLeader: '<远程实施组 Leader>',
+
+  // 一级部门 → Leader（组织架构页 /organization/framework）
+  deptLeaders: {
+    '<一级部门全名>': '<Leader姓名>',
+  },
 };

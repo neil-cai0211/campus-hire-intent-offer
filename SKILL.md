@@ -7,22 +7,44 @@ description: 校招录用审批、录用意向书与offer发送助手。用于�
 
 ## 边界
 
-1. 本Skill处理校招候选人从「录用审批」到「offer 已发出」的完整闭环。不处理社招、实习生、外派等非校招流程，也不处理简历筛选、面试安排、背调与体检。
+1. 本Skill处理候选人从「录用审批」到「offer 已发出」的完整闭环，覆盖**校招**与**社招（无需用人部门筛选）**两条链路。两条链路的字段口径、试用期、提交方式都不同，**先按下方表格分清**。不处理实习生流程、简历筛选、面试安排、背调与体检。
 2. 录用审批只负责**提交**，不负责代Neil决定录用谁；薪酬方案、职级、汇报对象等业务口径由Neil给定，Skill只负责录入。
 3. **录用意向书模板不复制进Skill**：一律引用公司目录 `D:\人力资源部文档分类（模板）\...\2-入职\` 下的原件。Skill保存的是「模板结构知识」（路径、字段口径、字符下标表），不是模板副本。模板会被公司更新（技术职能类模板 2026-10-21 已改过一次），副本会静默过期并导致填错位置。
 4. **offer邮件是对候选人的外发内容，含薪酬与合同期**。发送前必须停下来给Neil确认，不得连续发送多份未经确认的offer。
-5. Skill保存通用规则、结构知识与调度入口；具体人员、薪酬、模板下标等属于运行配置，集中在 `config.js` 与 `people.js`，不写死在Skill里。
-6. 不讨论绩效评分、奖金换算、人员排名。
+5. **社招意向书与offer要等录用审批全部通过（审批人为 Neil）后才做**。审批未通过时入职日期可能变、offer表单还不能填。等 Neil 明确通知。
+6. Skill保存通用规则、结构知识与调度入口；具体人员、薪酬、模板下标等属于运行配置，集中在 `config.js` 与 `people.js`，不写死在Skill里。
+7. 不讨论绩效评分、奖金换算、人员排名。
 
 ## 按场景读取参考
 
 - **选模板、查字段口径、查某格填什么** → 读取 [模板结构与字段口径](references/templates.md)
 - **提交录用审批（校招）** → 读取 [链路一 录用审批](references/workflow-approval.md)
 - **提交录用审批（社招 / 无需用人部门筛选）** → 读取 [链路一B 社招录用审批](references/workflow-social-approval.md)
+- **社招走录用意向书 + offer** → 读取 [链路二B/三B 社招意向书与offer](references/workflow-social-intent-offer.md)
 - **生成录用意向书PDF与插图** → 读取 [链路二 录用意向书](references/workflow-intent.md)
 - **改offer表单并发送** → 读取 [链路三 offer发送](references/workflow-offer.md)
 - **脚本报错、图模糊、脚本卡死、生成结果异常** → 读取 [踩坑与故障排查](references/pitfalls.md)
-- **模板被公司更新过** → 先跑 `scripts/dump-template.ps1` 重新取结构，再更新 `config.js`
+- **需要精确的字符下标表** → 读取 `references/template-slots.json`（五套模板 × 62 个单元格的槽位结构，机器解析所得）
+- **模板被公司更新过** → 按下方「模板结构维护」三步更新
+
+## 模板结构维护（模板被公司改动时）
+
+模板一改，字符下标会整体漂移，而生成流程**不会报错**——只会静默填错位置。必须走这三步：
+
+```bash
+cd scripts
+# 1) dump 模板结构（输出到 scripts/template-dump.txt）
+powershell -NoProfile -ExecutionPolicy Bypass -File dump-template.ps1 -Template "<模板绝对路径>"
+# 2) 解析出槽位（机器提取，比手抄可靠）
+node parse-slots.js "<dump文件>" "<slots-xxx.json>"
+# 3) 交叉校验 config.js 的 fills 是否仍与模板对齐
+node verify-slots.js
+```
+
+`verify-slots.js` 会输出每套模板的填位对齐情况；**任何一条不一致都必须先修 config.js 再生成**。
+
+> ⚠ **JavaScript 的注释是 `//` 和 `/* */`，不是 `#`**。写脚本时用 `#` 当注释会报 `SyntaxError: Invalid or unexpected token`（且报错点在第 1 行，容易误判成编码问题）。
+
 
 ## 场景识别
 

@@ -1,0 +1,829 @@
+{
+ "tech": {
+  "label": "1-2 职能及技术类",
+  "cells": {
+   "R1C2": [
+    {
+     "start": 6,
+     "len": 6,
+     "value": "中级招聘专员",
+     "raw": "中级招聘专员"
+    }
+   ],
+   "R2C2": [
+    {
+     "start": 6,
+     "len": 4,
+     "value": "福建福州",
+     "raw": "福建福州"
+    }
+   ],
+   "R3C2": [
+    {
+     "start": 8,
+     "len": 6,
+     "value": "人力资源部",
+     "raw": "人力资源部"
+    }
+   ],
+   "R4C2": [
+    {
+     "start": 6,
+     "len": 2,
+     "value": "VP",
+     "raw": "VP"
+    }
+   ],
+   "R5C2": [
+    {
+     "start": 1,
+     "len": 4,
+     "value": "2026",
+     "raw": "2026"
+    },
+    {
+     "start": 6,
+     "len": 2,
+     "value": "10",
+     "raw": "10"
+    },
+    {
+     "start": 9,
+     "len": 2,
+     "value": "23",
+     "raw": "23"
+    },
+    {
+     "start": 32,
+     "len": 1,
+     "value": "",
+     "raw": ""
+    }
+   ],
+   "R6C2": [
+    {
+     "start": 0,
+     "len": 1,
+     "value": "3",
+     "raw": "3"
+    },
+    {
+     "start": 16,
+     "len": 2,
+     "value": "12",
+     "raw": "12"
+    },
+    {
+     "start": 19,
+     "len": 2,
+     "value": "31",
+     "raw": "31"
+    }
+   ],
+   "R7C2": [
+    {
+     "start": 5,
+     "len": 1,
+     "value": "6",
+     "raw": "6"
+    },
+    {
+     "start": 8,
+     "len": 1,
+     "value": "",
+     "raw": ""
+    }
+   ],
+   "R9C2": [
+    {
+     "start": 17,
+     "len": 7,
+     "value": "85%",
+     "raw": " 85%   "
+    }
+   ],
+   "R10C2": [
+    {
+     "start": 16,
+     "len": 4,
+     "value": "8000",
+     "raw": "8000"
+    }
+   ],
+   "R13C2": [
+    {
+     "start": 15,
+     "len": 4,
+     "value": "6400",
+     "raw": "6400"
+    }
+   ],
+   "R13C3": [
+    {
+     "start": 14,
+     "len": 3,
+     "value": "400",
+     "raw": "400"
+    }
+   ],
+   "R13C4": [
+    {
+     "start": 15,
+     "len": 4,
+     "value": "1200",
+     "raw": "1200"
+    }
+   ],
+   "R16C2": [
+    {
+     "start": 10,
+     "len": 4,
+     "value": "2026",
+     "raw": "2026"
+    },
+    {
+     "start": 15,
+     "len": 2,
+     "value": "10",
+     "raw": "10"
+    },
+    {
+     "start": 18,
+     "len": 2,
+     "value": "23",
+     "raw": "23"
+    },
+    {
+     "start": 167,
+     "len": 12,
+     "value": "",
+     "raw": "            "
+    },
+    {
+     "start": 197,
+     "len": 22,
+     "value": "",
+     "raw": "                      "
+    }
+   ]
+  }
+ },
+ "sales": {
+  "label": "1-1 销售通用类",
+  "cells": {
+   "R1C2": [
+    {
+     "start": 8,
+     "len": 10,
+     "value": "",
+     "raw": "          "
+    }
+   ],
+   "R2C2": [
+    {
+     "start": 5,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    }
+   ],
+   "R3C2": [
+    {
+     "start": 7,
+     "len": 19,
+     "value": "",
+     "raw": "                  "
+    }
+   ],
+   "R4C2": [
+    {
+     "start": 7,
+     "len": 14,
+     "value": "",
+     "raw": "              "
+    }
+   ],
+   "R5C2": [
+    {
+     "start": 0,
+     "len": 7,
+     "value": "",
+     "raw": "       "
+    },
+    {
+     "start": 8,
+     "len": 4,
+     "value": "",
+     "raw": "    "
+    },
+    {
+     "start": 13,
+     "len": 6,
+     "value": "",
+     "raw": "      "
+    },
+    {
+     "start": 39,
+     "len": 1,
+     "value": "",
+     "raw": ""
+    }
+   ],
+   "R6C2": [
+    {
+     "start": 0,
+     "len": 5,
+     "value": "",
+     "raw": "     "
+    },
+    {
+     "start": 20,
+     "len": 5,
+     "value": "",
+     "raw": "     "
+    },
+    {
+     "start": 26,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    }
+   ],
+   "R7C2": [
+    {
+     "start": 5,
+     "len": 5,
+     "value": "6",
+     "raw": "  6  "
+    }
+   ],
+   "R9C2": [
+    {
+     "start": 17,
+     "len": 7,
+     "value": "85%",
+     "raw": " 85%   "
+    }
+   ],
+   "R10C2": [
+    {
+     "start": 16,
+     "len": 11,
+     "value": "4000",
+     "raw": "  4000     "
+    }
+   ],
+   "R12C2": [
+    {
+     "start": 16,
+     "len": 10,
+     "value": "3800",
+     "raw": "   3800   "
+    }
+   ],
+   "R12C3": [
+    {
+     "start": 15,
+     "len": 9,
+     "value": "200",
+     "raw": "  200    "
+    }
+   ],
+   "R15C2": [
+    {
+     "start": 9,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    },
+    {
+     "start": 18,
+     "len": 7,
+     "value": "",
+     "raw": "       "
+    },
+    {
+     "start": 26,
+     "len": 7,
+     "value": "",
+     "raw": "       "
+    },
+    {
+     "start": 180,
+     "len": 12,
+     "value": "",
+     "raw": "            "
+    },
+    {
+     "start": 210,
+     "len": 22,
+     "value": "",
+     "raw": "                      "
+    }
+   ]
+  }
+ },
+ "brand": {
+  "label": "1-1 品牌营销类",
+  "cells": {
+   "R1C2": [
+    {
+     "start": 8,
+     "len": 13,
+     "value": "初级媒体运营专员",
+     "raw": "  初级媒体运营专员   "
+    }
+   ],
+   "R2C2": [
+    {
+     "start": 5,
+     "len": 20,
+     "value": "福州",
+     "raw": "      福州            "
+    }
+   ],
+   "R3C2": [
+    {
+     "start": 7,
+     "len": 26,
+     "value": "BrandPromotion(品牌推广部)",
+     "raw": "  Brand Promotion(品牌推广部) "
+    }
+   ],
+   "R4C2": [
+    {
+     "start": 7,
+     "len": 10,
+     "value": "品牌营销VP",
+     "raw": " 品牌营销VP   "
+    }
+   ],
+   "R5C2": [
+    {
+     "start": 0,
+     "len": 7,
+     "value": "2026",
+     "raw": " 2026  "
+    },
+    {
+     "start": 8,
+     "len": 4,
+     "value": "04",
+     "raw": " 04 "
+    },
+    {
+     "start": 13,
+     "len": 5,
+     "value": "15",
+     "raw": "  15 "
+    },
+    {
+     "start": 38,
+     "len": 1,
+     "value": "",
+     "raw": ""
+    }
+   ],
+   "R6C2": [
+    {
+     "start": 0,
+     "len": 3,
+     "value": "3",
+     "raw": "3  "
+    },
+    {
+     "start": 18,
+     "len": 4,
+     "value": "06",
+     "raw": " 06 "
+    },
+    {
+     "start": 23,
+     "len": 5,
+     "value": "30",
+     "raw": "  30 "
+    }
+   ],
+   "R7C2": [
+    {
+     "start": 5,
+     "len": 4,
+     "value": "3",
+     "raw": "  3 "
+    }
+   ],
+   "R9C2": [
+    {
+     "start": 17,
+     "len": 8,
+     "value": "100%",
+     "raw": " 100%   "
+    }
+   ],
+   "R10C2": [
+    {
+     "start": 16,
+     "len": 11,
+     "value": "6500",
+     "raw": "  6500     "
+    }
+   ],
+   "R12C2": [
+    {
+     "start": 16,
+     "len": 7,
+     "value": "",
+     "raw": "       "
+    }
+   ],
+   "R12C3": [
+    {
+     "start": 15,
+     "len": 7,
+     "value": "",
+     "raw": "       "
+    }
+   ],
+   "R15C2": [
+    {
+     "start": 9,
+     "len": 9,
+     "value": "2026",
+     "raw": "  2026   "
+    },
+    {
+     "start": 19,
+     "len": 5,
+     "value": "04",
+     "raw": "  04 "
+    },
+    {
+     "start": 25,
+     "len": 6,
+     "value": "15",
+     "raw": "  15  "
+    },
+    {
+     "start": 178,
+     "len": 12,
+     "value": "",
+     "raw": "            "
+    },
+    {
+     "start": 208,
+     "len": 22,
+     "value": "",
+     "raw": "                      "
+    }
+   ]
+  }
+ },
+ "other": {
+  "label": "1-2 其他",
+  "cells": {
+   "R1C2": [
+    {
+     "start": 6,
+     "len": 7,
+     "value": "大客户经理",
+     "raw": " 大客户经理 "
+    }
+   ],
+   "R2C2": [
+    {
+     "start": 6,
+     "len": 4,
+     "value": "成都",
+     "raw": " 成都 "
+    }
+   ],
+   "R3C2": [
+    {
+     "start": 8,
+     "len": 6,
+     "value": "销售线",
+     "raw": " 销售线 "
+    }
+   ],
+   "R4C2": [
+    {
+     "start": 6,
+     "len": 6,
+     "value": "销售VP",
+     "raw": " 销售VP "
+    }
+   ],
+   "R5C2": [
+    {
+     "start": 1,
+     "len": 6,
+     "value": "2026",
+     "raw": " 2026 "
+    },
+    {
+     "start": 8,
+     "len": 4,
+     "value": "01",
+     "raw": " 01 "
+    },
+    {
+     "start": 13,
+     "len": 4,
+     "value": "04",
+     "raw": " 04 "
+    },
+    {
+     "start": 38,
+     "len": 1,
+     "value": "",
+     "raw": ""
+    }
+   ],
+   "R6C2": [
+    {
+     "start": 0,
+     "len": 3,
+     "value": "3",
+     "raw": " 3 "
+    },
+    {
+     "start": 18,
+     "len": 6,
+     "value": "03",
+     "raw": "  03  "
+    },
+    {
+     "start": 25,
+     "len": 6,
+     "value": "31",
+     "raw": "  31  "
+    }
+   ],
+   "R7C2": [
+    {
+     "start": 5,
+     "len": 5,
+     "value": "6",
+     "raw": "  6  "
+    },
+    {
+     "start": 12,
+     "len": 1,
+     "value": "",
+     "raw": ""
+    }
+   ],
+   "R11C2": [
+    {
+     "start": 16,
+     "len": 7,
+     "value": "12250",
+     "raw": " 12250 "
+    }
+   ],
+   "R11C3": [
+    {
+     "start": 15,
+     "len": 7,
+     "value": "750",
+     "raw": "  750  "
+    }
+   ],
+   "R11C4": [
+    {
+     "start": 16,
+     "len": 8,
+     "value": "2000",
+     "raw": "  2000  "
+    }
+   ],
+   "R14C2": [
+    {
+     "start": 10,
+     "len": 6,
+     "value": "2026",
+     "raw": " 2026 "
+    },
+    {
+     "start": 17,
+     "len": 6,
+     "value": "01",
+     "raw": "  01  "
+    },
+    {
+     "start": 24,
+     "len": 6,
+     "value": "04",
+     "raw": "  04  "
+    },
+    {
+     "start": 177,
+     "len": 12,
+     "value": "",
+     "raw": "            "
+    },
+    {
+     "start": 207,
+     "len": 22,
+     "value": "",
+     "raw": "                      "
+    }
+   ]
+  }
+ },
+ "expatriate": {
+  "label": "1-3 销售外派类",
+  "cells": {
+   "R1C2": [
+    {
+     "start": 8,
+     "len": 6,
+     "value": "外派销售代表",
+     "raw": "外派销售代表"
+    }
+   ],
+   "R2C2": [
+    {
+     "start": 5,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    }
+   ],
+   "R3C2": [
+    {
+     "start": 7,
+     "len": 25,
+     "value": "SalesChina",
+     "raw": "       Sales China      "
+    }
+   ],
+   "R4C2": [
+    {
+     "start": 7,
+     "len": 12,
+     "value": "销售VP",
+     "raw": "  销售VP      "
+    }
+   ],
+   "R5C2": [
+    {
+     "start": 0,
+     "len": 7,
+     "value": "2025",
+     "raw": " 2025  "
+    },
+    {
+     "start": 8,
+     "len": 3,
+     "value": "x",
+     "raw": " x "
+    },
+    {
+     "start": 12,
+     "len": 5,
+     "value": "x",
+     "raw": "  x  "
+    },
+    {
+     "start": 37,
+     "len": 1,
+     "value": "",
+     "raw": ""
+    }
+   ],
+   "R6C2": [
+    {
+     "start": 0,
+     "len": 4,
+     "value": "3",
+     "raw": "  3 "
+    },
+    {
+     "start": 19,
+     "len": 5,
+     "value": "12",
+     "raw": " 12  "
+    },
+    {
+     "start": 25,
+     "len": 8,
+     "value": "31",
+     "raw": "   31   "
+    }
+   ],
+   "R7C2": [
+    {
+     "start": 6,
+     "len": 3,
+     "value": "6",
+     "raw": " 6 "
+    },
+    {
+     "start": 13,
+     "len": 3,
+     "value": "3",
+     "raw": " 3 "
+    }
+   ],
+   "R9C2": [
+    {
+     "start": 56,
+     "len": 5,
+     "value": "",
+     "raw": "     "
+    }
+   ],
+   "R10C2": [
+    {
+     "start": 17,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    }
+   ],
+   "R11C2": [
+    {
+     "start": 16,
+     "len": 9,
+     "value": "",
+     "raw": "         "
+    }
+   ],
+   "R14C2": [
+    {
+     "start": 11,
+     "len": 3,
+     "value": "",
+     "raw": "   "
+    },
+    {
+     "start": 17,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    }
+   ],
+   "R14C3": [
+    {
+     "start": 11,
+     "len": 3,
+     "value": "",
+     "raw": "   "
+    },
+    {
+     "start": 17,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    }
+   ],
+   "R14C4": [
+    {
+     "start": 11,
+     "len": 3,
+     "value": "",
+     "raw": "   "
+    },
+    {
+     "start": 17,
+     "len": 8,
+     "value": "",
+     "raw": "        "
+    }
+   ],
+   "R17C2": [
+    {
+     "start": 9,
+     "len": 8,
+     "value": "2025",
+     "raw": "  2025  "
+    },
+    {
+     "start": 18,
+     "len": 6,
+     "value": "",
+     "raw": "      "
+    },
+    {
+     "start": 25,
+     "len": 7,
+     "value": "",
+     "raw": "       "
+    },
+    {
+     "start": 179,
+     "len": 12,
+     "value": "",
+     "raw": "            "
+    },
+    {
+     "start": 209,
+     "len": 22,
+     "value": "",
+     "raw": "                      "
+    }
+   ]
+  }
+ }
+}

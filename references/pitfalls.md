@@ -129,15 +129,21 @@ bash "D:/AI-Workspace/校招审批/start-chrome.sh"   # 幂等启动脚本
 **解法（两条都做）**：
 ```powershell
 # 1) 建稳定入口（junction 指向版本目录，PortableGit 升级时不会失效）
-New-Item -ItemType Junction -Path "C:\Users\huiji\bin\git" `
-  -Target "C:\Users\huiji\.workbuddy\binaries\PortableGit\versions\<ver>\cmd"
-[Environment]::SetEnvironmentVariable("Path", "$userPath;C:\Users\huiji\bin\git", "User")
+$gitLink = "$HOME\bin\git"
+$gitTarget = "$HOME\.workbuddy\binaries\PortableGit\versions\<ver>\cmd"
+New-Item -ItemType Junction -Path $gitLink -Target $gitTarget
+[Environment]::SetEnvironmentVariable("Path", "$userPath;$gitLink", "User")
 
 # 2) 在 VS Code 设置里显式指定（不依赖 PATH 继承，优先级更高）
 #    %APPDATA%\Code\User\settings.json
-{ "git.path": "C:\\Users\\huiji\\bin\\git\\git.exe" }
+{ "git.path": "$HOME\\bin\\git\\git.exe" }
 ```
 改完 `settings.json` 后**完全重启 VS Code**（关掉所有 Code 进程再启动）。
+
+⚠ **改完 PATH 当前进程不会生效** —— 验证要手动拼 `User + Machine` 后重跑：
+```powershell
+$env:Path = [Environment]::GetEnvironmentVariable("Path","User") + ";" + [Environment]::GetEnvironmentVariable("Path","Machine")
+```
 
 **验证**：VS Code 里按 `Ctrl+Shift+B` 跑「Git: 查看仓库状态」任务（见 `.vscode/tasks.json`），能输出分支行即通。
 
