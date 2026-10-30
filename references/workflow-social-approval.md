@@ -33,7 +33,31 @@
 
 ## 薪酬：转正前 / 转正后两套字段
 
-⚠ **表单里有 6 个薪资输入框**，且**不在 `.el-form-item` 里**（用 placeholder 顺序填会串位，必须按 label 精确定位）。
+⚠ **表单里有 6 个薪资输入框**（试用期/转正后 各 3 项）+ 2 个合计。
+
+**两个必须知道的机制**（2026-10-30 实测）：
+
+**① 薪酬区的「两套」由「试用期」下拉触发** —— 初始状态只有 3 个框（基本/保密/绩效），
+选了具体的试用期月数（如 3个月）后，**立刻展开成试用期/转正后两套 6 项 + 两个合计**。
+选岗位、选职级、选合同主体都**不会**触发 —— 只有「试用期」会。
+⇒ **填表顺序必须把「试用期」放最前面**，否则后面找不到 6 个槽位。
+
+**② 薪资输入框不能用键盘输入** —— `page.keyboard.type()` 填进去值会被组件重置回空。
+必须用 JS 赋值 + 派发事件：
+
+```js
+const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+setter.call(inp, val);
+inp.dispatchEvent(new Event('input',  { bubbles: true }));
+inp.dispatchEvent(new Event('change', { bubbles: true }));
+inp.dispatchEvent(new Event('blur',   { bubbles: true }));
+```
+
+填完「工资合计」会自动算出，可用来验证比例是否对。
+
+**定位方式**：薪资区在 `.el-form-item` 里，但**它们的 label 是空的**，
+要靠父级 `innerText` 推断字段名（`试用期基本工资` / `转正后保密津贴`…），
+不能靠 label 元素，也不能靠 placeholder 顺序（会串位）。
 
 **通用口径（技术/职能/品牌营销线以外）**：
 - **转正后**：基本工资 80% + 保密津贴 5% + 绩效工资 15% = 100%
@@ -75,7 +99,7 @@
 5. **同名卡片**：王彤 / 王彤德，按应聘职位 + 按钮双重匹配。
 6. **页面会保存草稿**：填错可以直接刷新页面重填，不用从头再来（但刷新会丢失联想组件的交互态）。
 
-## ⚠ 三个必须知道的系统行为（都实测过）
+## ⚠ 五个必须知道的系统行为（都实测过）
 
 ### 1. 入职部门必须从组织架构的树里「选」，不能打字
 
@@ -113,4 +137,25 @@ await p.waitForTimeout(1200);
 系统的自动保存（失焦即存）已经生效，**「保存草稿」反而会重置表单**。
 
 **验证持久化的正确方式**：填完 → 刷新 → 重新读值。
+
+### 4. 草稿不保存：填表与提交必须在同一个页面会话内
+
+刷新页面后，**已填的字段全部丢失**（实测：填完 15 个字段，读回全空）。
+自动保存（失焦即存）对普通输入框有效，但 **JS 赋值的薪资字段不触发**，
+且整体草稿在刷新后不恢复。
+
+⇒ **填表与提交必须写成「一站式」脚本**：填 → 校验 → 点确定 → 弹窗确定，
+中间**任何时候都不要 goto / reload**。分两次脚本跑（先填、另一次提交）必然失败。
+
+### 5. 工作城市是 `select-world-city`，不是标准 cascader
+
+浮层结构：`el-popover el-popper select-world-city` + `cascader city-list-content`。
+用 `.el-cascader__dropdown:visible` **匹配不到**，要用：
+
+```js
+const prov = p.locator('.select-world-city:visible').getByText('福建省', { exact: true }).first();
+const city = p.locator('.city-list-content:visible, .select-world-city:visible').getByText('福州市', { exact: true }).first();
+```
+
+两级都要点（先省后市），点完读回确认是 `福建省/福州市`。
 
