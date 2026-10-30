@@ -76,6 +76,19 @@ Node 里写 Windows 路径：`'D:\\人力资源部\\...'`。多层转义（shell
 
 ## 三、Chrome / CDP
 
+### ⚠ 登录态是 session cookie —— Chrome 被强杀就会掉登录
+薪人薪事的登录 token 是**会话 cookie**（不落盘）。Chrome 进程一旦被**强杀**，
+下次启动就是未登录（跳 `/sso/login`），cookie 里只剩 `XRXSTrackId / aliyungf_tc / zcp / lastAPITime`。
+
+**根因**：Bash 工具的 `run_in_background` 启动的进程，**会随会话结束被回收（强杀）**。
+
+**铁律**：
+1. **只用计划任务 `ChromeCDPGuard` 启动 Chrome**（VBS 独立进程树，不受 Bash 回收影响）
+2. **不要用 Bash 后台任务启动 Chrome** —— 那样起的实例会被回收 → 掉登录 → 后续脚本全挂在登录页
+3. 掉了登录只能让用户重新扫码，**无法用脚本恢复**
+
+**判据**：访问列表页后 body 含「工作台 / 审批中」= 已登录；含「验证码登录 / 忘记密码」= 掉了。
+
 ### 端口连不上
 
 `connect ECONNREFUSED 127.0.0.1:9333`
