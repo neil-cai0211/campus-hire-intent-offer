@@ -19,6 +19,28 @@ const IMG = process.argv[4];
 const DO_SEND = process.argv.includes('--send');
 const OUT = 'D:/AI-Workspace/liuyi-work';   // 截图输出
 
+// ⚠ 插图（jpg）必须与当前意向书 PDF 同步 —— 改了 PDF 没重新生成插图，
+//   邮件里发出去的就是旧版。这里用「同目录 PDF 的修改时间 vs jpg 的修改时间」做校验：
+//   jpg 比 PDF 旧 ⇒ 插图没更新 ⇒ 直接中止，不允许发。
+if (IMG) {
+  const pdfDir = 'D:/AI-Workspace/录用意向书/out';
+  const base = path.basename(IMG).replace(/\.jpg$/i, '.pdf');
+  const pdfGuess = path.join(pdfDir, base);
+  if (fs.existsSync(pdfGuess)) {
+    const pdfM = fs.statSync(pdfGuess).mtimeMs;
+    const imgM = fs.statSync(IMG).mtimeMs;
+    if (imgM < pdfM) {
+      console.error('✗ 中止：插图比意向书 PDF 旧（PDF ' + new Date(pdfM).toLocaleString('zh-CN') +
+        ' / JPG ' + new Date(imgM).toLocaleString('zh-CN') + '）');
+      console.error('  先重新生成插图：node make-insert-png.js');
+      process.exit(2);
+    }
+    console.log('插图时效校验: OK（jpg 不早于 pdf）');
+  } else {
+    console.log('插图时效校验: 跳过（未找到对应 PDF: ' + pdfGuess + '）');
+  }
+}
+
 (async () => {
   const browser = await chromium.connectOverCDP('http://127.0.0.1:9333');
   const ctx = browser.contexts()[0];

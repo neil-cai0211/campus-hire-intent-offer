@@ -201,3 +201,31 @@ offer 预览页的「邮件模板」下拉有 4 项：`正式员工 - 福州` / 
 
 `String.fromCharCode(...new Uint8Array(buf))` 在 1MB+ 时报
 `RangeError: Maximum call stack size exceeded`。改成**分块**（每次 8192 字节）再 `btoa`。
+
+### ⚠ 跨天发送 ⇒ 告知有效期要按实际发送日重算
+
+意向书是**先**生成的，offer 是**后**发的。跨天时意向书里写的有效期就过期了。
+
+有效期规则：**从发送当天起算、含当天**（对应 offer 表单的「offer有效期」= N 天）。
+例：10-29 生成、10-31 发送、有效期 3 天 → 告知有效期应至 **11-02**，不是 11-01。
+
+⇒ 用 `OFFER_BASE_DATE` 环境变量指定**实际发送日**重跑意向书：
+
+```bash
+OFFER_BASE_DATE=2026-10-31 node gen-intent.js "<候选人cfg JSON>"
+```
+
+⚠ 只改 people.js 的日期字段**没用** —— 有效期是 `valid-date.js` 的
+`attachValidDates()` 在运行时动态计算的，必须带环境变量重跑。
+
+### ⚠ 意向书 PDF 与邮件插图（jpg）是两份独立产物
+
+改了 PDF **必须重新生成插图**，否则邮件里发出去的还是旧版。
+
+```bash
+node make-insert-png.js          # 全量
+node make-insert-png.js 15 16    # 只生成指定 no（改了个别 PDF 后用这个）
+```
+
+**核验发出的对不对**：从日志拿插图的 ptoken，`fetch` 下载服务器上那一份，
+比对字节数与本地一致 = 发的是修正版；不一致就是插图没重新生成。
