@@ -18,6 +18,9 @@ module.exports = {
   // 远程实施组 Leader（汇报对象）
   socialLeader: '<远程实施组 Leader>',
 
+  // offer 邮件的「抄送邮箱」收件人姓名（脚本按此名在联想候选里选）
+  ccName: '<抄送收件人姓名>',
+
   // 一级部门 → Leader（组织架构页 /organization/framework）
   deptLeaders: {
     '<一级部门全名>': '<Leader姓名>',
