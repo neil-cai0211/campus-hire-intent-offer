@@ -22,9 +22,12 @@ description: 校招录用审批、录用意向书与offer发送助手。用于�
 - **提交录用审批（社招 / 无需用人部门筛选）** → 读取 [链路一B 社招录用审批](references/workflow-social-approval.md)
   ⚠ 该文档开头的「填写顺序」章节是**必读**，字段之间有依赖，顺序错了不报错但会跑出残缺表单。
 - **社招走录用意向书 + offer** → 读取 [链路二B/三B 社招意向书与offer](references/workflow-social-intent-offer.md)
+- **要跑社招 offer 一站式脚本（填表→预览→插图→发送）** → 读取 [社招 offer 一站式脚本](references/workflow-social-offer-onespass.md)
+  ⚠ 该文档含**最危险的坑**：预览时可能弹「必审字段被修改，将重新审批offer」——**必须点「取消」**，点「确定」会发起审批导致 offer 发不出去。
 - **生成录用意向书PDF与插图** → 读取 [链路二 录用意向书](references/workflow-intent.md)
 - **改offer表单并发送** → 读取 [链路三 offer发送](references/workflow-offer.md)
 - **脚本报错、图模糊、脚本卡死、生成结果异常** → 读取 [踩坑与故障排查](references/pitfalls.md)
+- **要判断 offer 到底发出去了没** → 读 pitfalls 的「判断 offer 是否真的发出」一节（**别看列表页的发送时间列，是空的，会误判**）
 - **需要精确的字符下标表** → 读取 `references/template-slots.json`（五套模板 × 62 个单元格的槽位结构，机器解析所得）
 - **模板被公司更新过** → 按下方「模板结构维护」三步更新
 

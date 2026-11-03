@@ -308,33 +308,6 @@ function addMonths(dateStr, months) {
   log('  薪酬槽位数 = ' + slotCount);
   if (slotCount !== 6) die(`薪酬区未展开成 6 项（实际 ${slotCount}）——试用期没选上？`);
 
-  // ── step2 入职岗位 ─────────────────────────────────────
-  log('step2 入职岗位');
-  {
-    const pos = await clickInput('入职岗位');
-    if (!pos) die('入职岗位 无可见 input');
-    await p.mouse.click(pos.x, pos.y);
-    await p.waitForTimeout(2300);
-    // 岗位树：分类 → 岗位。分类按岗位名推断所在序列
-    const cat = map.seq && map.seq.includes('营销') ? '营销'
-      : map.seq && map.seq.includes('技术') ? '技术'
-      : map.seq && map.seq.includes('职能') ? '职能' : '管理';
-    const c = p.locator('.el-popper:visible').getByText(cat, { exact: true }).first();
-    if (await c.count()) {
-      await c.scrollIntoViewIfNeeded().catch(() => {});
-      await c.click({ timeout: 8000 }).catch(async () => { const bb = await c.boundingBox(); if (bb) await p.mouse.click(Math.round(bb.x + bb.width / 2), Math.round(bb.y + bb.height / 2)); });
-      await p.waitForTimeout(2000);
-    }
-    const t = p.locator('.el-popper:visible').getByText(cfg.position, { exact: true }).first();
-    if (!(await t.count())) die('岗位树里找不到: ' + cfg.position);
-    await t.scrollIntoViewIfNeeded().catch(() => {});
-    await t.click({ timeout: 8000 }).catch(async () => { const bb = await t.boundingBox(); if (bb) await p.mouse.click(Math.round(bb.x + bb.width / 2), Math.round(bb.y + bb.height / 2)); });
-    await p.waitForTimeout(2400);
-    const cur = await readItem('入职岗位');
-    log('  入职岗位 = ' + JSON.stringify(cur && cur.vals));
-    if (!((cur && cur.vals || [])[0] || '').includes(cfg.position)) die('岗位未选中');
-  }
-
   // ── step3 职级 ─────────────────────────────────────────
   log('step3 职级');
   {
@@ -356,6 +329,37 @@ function addMonths(dateStr, months) {
     const cur = await readItem('职级');
     log('  职级 = ' + JSON.stringify(cur && cur.vals));
     if (!((cur && cur.vals || [])[0] || '').includes(map.rank)) die('职级未选中');
+  }
+
+  // ── step2 入职岗位 ─────────────────────────────────────
+  log('step2 入职岗位');
+  {
+    const pos = await clickInput('入职岗位');
+    if (!pos) die('入职岗位 无可见 input');
+    await p.mouse.click(pos.x, pos.y);
+    await p.waitForTimeout(2300);
+    // 岗位树：分类 → 岗位。
+    // ⚠ 分类**不能只按序列推断** —— 「初级技术支持专员」在**营销**分类下，
+    //   但职级序列是「专业序列-P」，按 seq 推断会错成「技术」分类。
+    //   ⇒ 优先用 map.jobCategory（实测值），没有再按 seq 推断。
+    const cat = map.jobCategory
+      || (map.seq && map.seq.includes('营销') ? '营销'
+      : map.seq && map.seq.includes('技术') ? '技术'
+      : map.seq && map.seq.includes('职能') ? '职能' : '管理');
+    const c = p.locator('.el-popper:visible').getByText(cat, { exact: true }).first();
+    if (await c.count()) {
+      await c.scrollIntoViewIfNeeded().catch(() => {});
+      await c.click({ timeout: 8000 }).catch(async () => { const bb = await c.boundingBox(); if (bb) await p.mouse.click(Math.round(bb.x + bb.width / 2), Math.round(bb.y + bb.height / 2)); });
+      await p.waitForTimeout(2000);
+    }
+    const t = p.locator('.el-popper:visible').getByText(cfg.position, { exact: true }).first();
+    if (!(await t.count())) die('岗位树里找不到: ' + cfg.position);
+    await t.scrollIntoViewIfNeeded().catch(() => {});
+    await t.click({ timeout: 8000 }).catch(async () => { const bb = await t.boundingBox(); if (bb) await p.mouse.click(Math.round(bb.x + bb.width / 2), Math.round(bb.y + bb.height / 2)); });
+    await p.waitForTimeout(2400);
+    const cur = await readItem('入职岗位');
+    log('  入职岗位 = ' + JSON.stringify(cur && cur.vals));
+    if (!((cur && cur.vals || [])[0] || '').includes(cfg.position)) die('岗位未选中');
   }
 
   // ── step4 日期 ─────────────────────────────────────────
@@ -490,10 +494,21 @@ function addMonths(dateStr, months) {
   // ── step10 入职部门（必须最后填，否则被联动覆盖）─────────
   log('step10 入职部门');
   {
-    const dp = await clickInput('入职部门');
+    // ⚠ 部门选择器的 input 在 .single-select-dept-wrapper 里，
+    //   clickInput 找到的是 .el-form-item 的第一个 input（位置不同，点不中）。
+    //   ⇒ 直接定位 wrapper 的 input 点它。
+    const dp = await p.evaluate(() => {
+      const w = document.querySelector('.single-select-dept-wrapper');
+      if (!w) return null;
+      const inp = w.querySelector('input');
+      if (!inp) return null;
+      inp.scrollIntoView({ block: 'center' });
+      const r = inp.getBoundingClientRect();
+      return { x: Math.round(r.x + Math.min(30, r.width / 2)), y: Math.round(r.y + r.height / 2) };
+    });
     if (!dp) die('入职部门 无可见 input');
     await p.mouse.click(dp.x, dp.y);
-    await p.waitForTimeout(2600);
+    await p.waitForTimeout(2800);
     // 按 fullPath 逐级展开
     // ⚠ 树的节点文字可能与 fullPath 段不完全一致
     //   （例：fullPath 段 "Implementation(远程实施部)"，树上可能显示为 "Implementation(远程实施部)"，
@@ -504,46 +519,59 @@ function addMonths(dateStr, months) {
       // 用括号前的英文名做更宽松的匹配键
       const key = (kw.match(/^([^(（]+)/) || [null, kw])[1].trim() || kw;
       const n = await p.evaluate((keys) => {
-        const d = document.querySelector('.dept-dropdown'); if (!d) return [];
         const out = [];
-        d.querySelectorAll('.el-tree-node__content').forEach(x => {
-          const bb = x.getBoundingClientRect(); if (bb.width < 10) return;
-          const txt = (x.innerText || '');
-          if (!keys.some(k => txt.includes(k))) return;
+        // ⚠ 树在 .dept-dropdown 里，但它是 .single-select-dept-wrapper 的**兄弟节点**，
+        //   不是 wrapper 的后代 ⇒ 必须全局查，不能限定在某个容器内。
+        for (const x of [...document.querySelectorAll('.el-tree-node__content')]) {
+          const bb = x.getBoundingClientRect();
+          if (bb.width < 10 || bb.height < 4) continue;
+          const txt = (x.innerText || '').replace(/\n+/g, ' ').trim();
+          if (!keys.some(k => txt.includes(k))) continue;
           const ic = x.querySelector('.el-tree-node__expand-icon');
           const ib = ic ? ic.getBoundingClientRect() : null;
           if (ib && ib.width > 4) out.push({ x: Math.round(ib.x + ib.width / 2), y: Math.round(ib.y + ib.height / 2), txt: txt.slice(0, 40) });
-        });
+        }
         // 取文本最短的候选（最贴近该级节点）
         out.sort((a, b2) => a.txt.length - b2.txt.length);
         return out;
       }, [kw, key]);
-      if (!n.length) die('部门树里找不到可展开节点: ' + kw);
+      if (!n.length) {
+        const dbg = await p.evaluate(() => {
+          const d = document.querySelector('.dept-dropdown');
+          const all = [...document.querySelectorAll('.el-tree-node__content')].map(e => {
+            const bb = e.getBoundingClientRect();
+            return { t: (e.innerText||'').replace(/\n+/g,' ').trim().slice(0,45), w: Math.round(bb.width), inD: d ? d.contains(e) : false };
+          });
+          return { dFound: !!d, dCls: d ? (d.className||'').toString().slice(0,50) : null, all };
+        });
+        console.log('  [部门调试] ' + JSON.stringify(dbg));
+        die('部门树里找不到可展开节点: ' + kw);
+      }
       await p.mouse.click(n[0].x, n[0].y);
       await p.waitForTimeout(2300);
       log('  展开 ' + n[0].txt);
     }
-    // 点叶子节点文字（同样宽松匹配）
+    // 点叶子节点
+    // ⚠⚠ 这个部门选择器（.qj-dropdown / .single-select-dept-wrapper）
+    //   **坐标点击不落位**，只认 JS 派发的 click 事件（实测 2026-11-02）。
+    //   叶子文字在 .tree-item-content > span 里（不是 .custom-tree-node）。
     const leaf = segs[segs.length - 1];
-    const labs = await p.evaluate((keys) => {
-      const d = document.querySelector('.dept-dropdown'); if (!d) return [];
-      const out = [];
-      d.querySelectorAll('.el-tree-node__label, .el-tree-node__content span').forEach(x => {
-        const t = (x.textContent || '').trim();
-        if (!keys.some(k => t === k || t.includes(k))) return;
-        const bb = x.getBoundingClientRect(); if (bb.width < 10) return;
-        out.push({ x: Math.round(bb.x + bb.width / 2), y: Math.round(bb.y + bb.height / 2), t });
-      });
-      out.sort((a, b2) => a.t.length - b2.t.length);
-      return out;
-    }, [leaf]);
-    if (!labs.length) die('部门树里找不到叶子节点: ' + leaf);
-    await p.mouse.click(labs[0].x, labs[0].y);
-    await p.waitForTimeout(2500);
-    log('  点叶子: ' + labs[0].t);
+    const landed = await p.evaluate((k) => {
+      for (const e of document.querySelectorAll('.tree-item-content')) {
+        if ((e.innerText || '').replace(/\n+/g, ' ').trim() !== k) continue;
+        e.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+        return true;
+      }
+      return false;
+    }, leaf);
+    if (!landed) die('部门树里找不到叶子节点: ' + leaf);
+    await p.waitForTimeout(2600);
+    log('  点叶子(JS click): ' + leaf);
     const cur = await readItem('入职部门');
     log('  入职部门 = ' + JSON.stringify(cur && cur.vals));
-    if (!((cur && cur.vals || [])[0] || '').includes(dept)) die('部门未选中');
+    if (!((cur && cur.vals || [])[0] || '').includes(dept)) {
+      die('部门未选中（JS click 后值未回填）');
+    }
     // 判据：出现编制信息 = 真选中而非打字
     if (!/编制|占编/.test(cur.text || '')) die('部门下方无编制信息 —— 没真选中（可能只是输入了文本）');
   }
@@ -633,6 +661,23 @@ function addMonths(dateStr, months) {
   const dlg = p.locator('.el-dialog:visible, .qj-dialog:visible, .el-message-box:visible').first();
   if (await dlg.count()) {
     log('  弹窗: ' + (await dlg.innerText()).replace(/\n+/g, ' | ').slice(0, 200));
+    console.log('  [弹窗调试] dlg.count=' + await dlg.count() + ' innerText=' + JSON.stringify((await dlg.innerText().catch(()=>'')).replace(/\n+/g,' | ').slice(0,200)));
+    const btnsDbg = await p.evaluate(() => {
+      const out = [];
+      for (const d of document.querySelectorAll('.el-dialog, .qj-dialog, .el-message-box, [role="dialog"]')) {
+        const bb = d.getBoundingClientRect();
+        if (bb.width < 50) continue;
+        for (const e of d.querySelectorAll('button, .el-button, a, span, div')) {
+          const t = (e.innerText || e.textContent || '').replace(/\n+/g, ' ').trim();
+          if (!t || t.length > 8) continue;
+          const eb = e.getBoundingClientRect();
+          if (eb.width < 5 || eb.height < 5) continue;
+          out.push({ tag: e.tagName, cls: (e.className||'').toString().slice(0,45), t, x: Math.round(eb.x+eb.width/2), y: Math.round(eb.y+eb.height/2) });
+        }
+      }
+      return out;
+    });
+    console.log('  [弹窗调试] 可点项: ' + JSON.stringify(btnsDbg));
     const inOk = dlg.getByText('确定', { exact: true }).last();
     if (await inOk.count()) {
       await inOk.click({ timeout: 8000 }).catch(async () => {

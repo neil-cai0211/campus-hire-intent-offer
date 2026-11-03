@@ -300,7 +300,17 @@ module.exports = {
       },
       '中级实施专员': { dept: '远程实施组', fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组', seq: '营销序列-S', rank: 'S2', pay: 'default' },
       '高级实施专员': { dept: '远程实施组', fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组', seq: '营销序列-S', rank: 'S3', pay: 'default' },
-      '资深实施专员': { dept: '远程实施组', fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组', seq: '营销序列-S', rank: 'S4', pay: 'default' },
+      // 技术支持组（2026-11-02 新增，Neil 确认口径）
+    // ⚠ leader 是技术支持组自己的负责人，不是 CS 线 Leader
+    '初级技术支持专员': {
+      dept: '技术支持组',
+      fullPath: 'CS Dpt.(客户成功线)/Help Desk(技术支持部)/技术支持组',
+      seq: '营销序列-S', rank: 'S1',
+      leader: '<技术支持组 Leader>',
+      jobCategory: '营销',      // 岗位在 offer 表单的「营销」分类下
+      pay: 'default',
+    },
+    '资深实施专员': { dept: '远程实施组', fullPath: 'CS Dpt.(客户成功线)/Implementation(远程实施部)/远程实施组', seq: '营销序列-S', rank: 'S4', pay: 'default' },
     },
 
     // 一级部门 → Leader（组织架构页 /organization/framework）
