@@ -28,8 +28,16 @@ if (nameIdx >= 0) {
   targets = argv.slice(nameIdx + 1).filter(Boolean).map(n => ({ outName: n }));
   console.log('按 outName 生成 ' + targets.length + ' 份');
 } else {
+  // people.js 在**工作区**（含真实姓名，不入仓库），不在 skill 目录
+  const WORKSPACE = process.env.HIRE_WORKSPACE || 'D:\\AI-Workspace\\录用意向书';
   let people = [];
-  try { people = require('./people.js'); } catch (e) { people = []; }
+  try {
+    people = require(path.join(WORKSPACE, 'people.js'));
+  } catch (e) {
+    console.error('✗ 读不到 people.js（' + path.join(WORKSPACE, 'people.js') + '）：' + e.message);
+    console.error('  改用 --names "<outName>" 直接指定，或设 HIRE_WORKSPACE 指向工作区');
+    process.exit(2);
+  }
   const ONLY = argv.filter(a => /^\d+$/.test(a)).map(Number);
   targets = ONLY.length ? people.filter(p => ONLY.includes(p.no)) : people;
   if (!targets.length) {

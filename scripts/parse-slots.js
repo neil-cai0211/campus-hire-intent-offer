@@ -82,10 +82,19 @@ for (const [cell, segs] of Object.entries(slots)) {
   }));
 }
 
+// ⚠ 记下 dump 的 SIZE/MTIME ⇒ verify-slots.js 能校验「dump 与 slots 是否同版本」。
+//   不同版本时 slots 的下标与 config 不配套，校验结果全是假阳性（2026-11-12 踩过）。
+const dumpTxt = fs.existsSync(dumpPath) ? fs.readFileSync(dumpPath, 'utf8') : '';
+const sizeM = dumpTxt.match(/SIZE\s*:\s*(\d+)/);
+const mtimeM = dumpTxt.match(/MTIME\s*:\s*(\S+)/);
+if (sizeM) result.__dumpSize = Number(sizeM[1]);
+if (mtimeM) result.__dumpMtime = mtimeM[1];
+
 fs.writeFileSync(outPath, JSON.stringify(result, null, 1), 'utf8');
 
-console.log('=== 下划线槽位（' + Object.keys(result).length + ' 个单元格）===');
+console.log('=== 下划线槽位（' + Object.keys(result).filter(k => !k.startsWith('__')).length + ' 个单元格）===');
 for (const [cell, segs] of Object.entries(result)) {
+  if (cell.startsWith('__')) continue;   // __dumpSize / __dumpMtime 是元数据，不是单元格
   const desc = segs.map(g => {
     const v = g.value === '' ? '(空)' : g.value;
     return `[${g.start}+${g.len}]${v}`;

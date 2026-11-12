@@ -18,6 +18,9 @@ description: 校招录用审批、录用意向书与offer发送助手。用于�
 ## 按场景读取参考
 
 - **选模板、查字段口径、查某格填什么** → 读取 [模板结构与字段口径](references/templates.md)
+- **生成录用��向书（社招 / 一人一档 / Neil 逐项口述）** → 读取 [链路二C 社招录用意向书](references/workflow-social-intent.md)
+  ⚠ 该文档含「要问 Neil 的 11 项」清单、配置 JSON 格式、**管理序列 75/5/20 的比例坑**、留空模式。
+  ⚠ 生成后**必须裁图核验**（脚本报成功 ≠ 内容对）。
 - **提交录用审批（校招）** → 读取 [链路一 录用审批](references/workflow-approval.md)
 - **提交录用审批（社招 / 无需用人部门筛选）** → 读取 [链路一B 社招录用审批](references/workflow-social-approval.md)
   ⚠ 该文档开头的「填写顺序」章节是**必读**，字段之间有依赖，顺序错了不报错但会跑出残缺表单。

@@ -40,32 +40,48 @@ module.exports = {
     tech: {
       label: '职能及技术类',
       file: '1-2 录用意向书_职能及技术类_-25-01版_中文(2).doc',
-      fingerprint: { size: 53344, mtime: '2026-10-21T09:18:59' },
+      // ⚠ 2026-11-04 模板改版（53344 → 53308 字节）。改了 4 处：
+      //   ① 职位名槽位 6位→8位  ② 入职「日」2位→1位  ③ 有效期「日」2位→1位
+      //   ④ 新增「试用期收入比例」可填槽位（原模板写死 85%）
+      fingerprint: { size: 53308, mtime: '2026-11-04T16:38:18' },
       analyzed: true,
       rows: 18, cols: 4,
+      // strictLen: 填位长度必须精确等于「值部分长度」（只替换值，不动首尾空格）。
+      //   走 gen-intent.js（字符级精确替换）时必须开；
+      //   gen-intent-sales.js 那套是整段替换（含空格），不能开。
+      strictLen: true,
+      // 模板写死的默认比例。⚠ 管理序列用 75/5/20 ⇒ 需覆盖并同步改 texts 里的比例文字
       fixedParts: { basic: 80, secret: 5, perf: 15 },   // 基本/保密/绩效
-      salutation: { para: 3, idx: 0, len: 6 },
+      // 模板示例人名会随改版变化（2025版=赖沄葱，2026-11-04版=林清云）
+      // ⇒ 脚本改为**自动探测**「X：您好」取名，不硬编码
+      salutation: { auto: true },
       fills: [
-        { cell: '1,2',  idx: 6,  len: 6, field: 'job' },          // □职位名称：中级招聘专员
-        { cell: '3,2',  idx: 8,  len: 5, field: 'dept' },         // □部    门：人力资源部
+        { cell: '1,2',  idx: 6,  len: 8, field: 'job' },          // □职位名称：中级技术支持专员
+        { cell: '3,2',  idx: 8,  len: 5, field: 'dept' },         // □部    门：技术支持部
         { cell: '4,2',  idx: 6,  len: 2, field: 'boss' },         // □职位名称：VP
-        { cell: '5,2',  idx: 9,  len: 2, field: 'day' },          // □2026年10月23日
+        { cell: '5,2',  idx: 9,  len: 1, field: 'day' },          // □2026年11月2日（改版后「日」只占 1 位）
         { cell: '5,2',  idx: 6,  len: 2, field: 'month' },
         { cell: '5,2',  idx: 1,  len: 4, field: 'year' },
         { cell: '6,2',  idx: 19, len: 2, field: 'endDay' },       // 3年以上，终止日期为合同终止年的12月31日
         { cell: '6,2',  idx: 16, len: 2, field: 'endMonth' },
         { cell: '6,2',  idx: 0,  len: 1, field: 'endYears' },
-        { cell: '10,2', idx: 16, len: 4, field: 'fullInc' },      // 转正后收入：…8000元人民币
-        { cell: '13,2', idx: 15, len: 4, field: 'basic' },        // 80%，即6400元
-        { cell: '13,3', idx: 14, len: 3, field: 'secret' },       // 5%，即400元
-        { cell: '13,4', idx: 15, len: 4, field: 'perf' },         // 15%，即1200元
-        { cell: '16,2', idx: 18, len: 2, field: 'validDay' },     // 本通知书有效日期至2026年10月23日
+        { cell: '7,2',  idx: 5,  len: 1, field: 'probMonths' },   // 试用期限为3个月（改版后示例改成 3 个月）
+        { cell: '9,2',  idx: 17, len: 4, field: 'probRatio' },    // × 100%（改版后变成可填槽位，值部分 4 位）
+        { cell: '10,2', idx: 16, len: 4, field: 'fullInc' },      // 转正后收入：…6800元人民币
+        { cell: '13,2', idx: 15, len: 4, field: 'basic' },        // 80%，即5440元
+        { cell: '13,3', idx: 14, len: 3, field: 'secret' },       // 5%，即340元
+        { cell: '13,4', idx: 15, len: 4, field: 'perf' },         // 15%，即1020元
+        { cell: '16,2', idx: 18, len: 1, field: 'validDay' },     // 本通知书有效日期至2026年11月2日
         { cell: '16,2', idx: 15, len: 2, field: 'validMonth' },
         { cell: '16,2', idx: 10, len: 4, field: 'validYear' },
       ],
       texts: [
         { cell: '2,2', from: '福建福州及您参与的项目或工作任务所涉及的区域', field: 'location' },
-        { cell: '7,2', from: '试用期限为6个月', field: 'probMonthsText' },
+        // ⚠ R13 三列的**比例是模板正文里的普通字**（不是下划线槽位），
+        //   模板写死 80%/5%/15%。管理序列 75/5/20 ⇒ 必须替换，否则金额与比例自相矛盾。
+        { cell: '13,2', from: '占目标税前收入满额的80%，', field: 'basicPctText' },
+        { cell: '13,3', from: '占目标税前收入满额的5%，', field: 'secretPctText' },
+        { cell: '13,4', from: '占目标税前收入满额的15%，', field: 'perfPctText' },
       ],
     },
 
