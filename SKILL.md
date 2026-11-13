@@ -84,6 +84,7 @@ node verify-slots.js
 4. **只用字符级替换处理带下划线的数字**。技术模板的告知有效期原文「2026年10月23日」与入职日期原文同在文档中，用Find/Replace会串改。
 5. **推送 GitHub 前必须先自检并把「待 Neil 确认」放在最前面**。自检 7 项：脱敏、凭证扫描、私密文件已排除、脱敏后功能仍可用、commit message 有正文、仓库可见性正确、推送后验证远端。详见 [交付前确认与推送规范](references/push-protocol.md)。
 6. **社招录用审批的字段填写顺序是硬约束**。顺序错了不报错，但会跑出残缺表单（薪酬只有 3 个框 / 入职部门被清空 / 提交时字段为空）。**优先用通用脚本** `fill-approval-social.js`（顺序写死在代码里 + 每步自检），别手写。手工填也必须按 reference 里的 12 步顺序，三条最关键：试用期**第一个**填（否则薪酬区不展开成两套）、入职部门**最后**填（否则被联动覆盖）、填表与提交**必须一站式**（草稿不保存，刷新即丢）。详见 [链路一B 社招录用审批](references/workflow-social-approval.md)。
+7. 🔴 **薪酬口径以「已生成的录用意向书」+ Neil 当时的逐项确认为准，禁止套通用比例**。通用 80/5/15「试用期无绩效」只是缺省值；个案可能是 `试用期 100%（不打折）`，此时试用期三项与转正后完全相同（绩效照填），合计 = 满额。2026-11-13 某管理序列社招审批就因套用缺省值把试用期合计少填了一档绩效并提交了。**填薪酬前必须先读该候选人意向书配置（`R9C2` 试用期比例 / `R10C2` 满额 / `R13C2-4` 拆分），把比例当显式字段写进配置，并在提交前单独向 Neil 报一次「试用期合计」。** 详见 [链路一B 薪酬章节](references/workflow-social-approval.md)。
 
 ## 执行位置
 
@@ -100,10 +101,12 @@ node verify-slots.js
 
 ## 环境前置
 
-1. Chrome调试实例必须运行（脚本用CDP连接，需登录态）：
-   ```bash
-   bash "D:/AI-Workspace/校招审批/start-chrome.sh"
-   ```
-   或靠计划任务 `ChromeCDPGuard` 每分钟自愈。**端口不通时脚本报 `connect ECONNREFUSED 127.0.0.1:9333`**。
+1. **浏览器自动化 = Web Access（CDP Proxy），不用 playwright**（2026-11-13 切换，playwright-core 已卸载）：
+   - 日常 Chrome 打开 `chrome://inspect/#remote-debugging` → 勾选 `Allow remote debugging for this browser instance` ⇒ 生成 `DevToolsActivePort`（默认 9222）
+   - 常驻代理：`node ~/.workbuddy/skills/web-access/scripts/cdp-proxy.mjs --browser chrome`（监听 `127.0.0.1:3456`）
+   - 脚本用 HTTP `/eval?target=`、`/navigate?target=`、`/new`、`/targets` 操作；`config.env` 里固定 `WEB_ACCESS_BROWSER=chrome`
+   - 用**日常 profile** ⇒ 登录态天然在，不用扫码、不用独立 9333 实例
+   - ⚠ `/eval` 返回空不等于没执行，重跑前先读页面状态（详见 [踩坑 三](references/pitfalls.md)）
+   - 旧的 `start-chrome.sh` / `ChromeCDPGuard` / 9333 端口方案**已停用**
 2. Word COM 可用。生成意向书前先清掉残留WINWORD进程与Word恢复记录，否则 `Documents.Open` 会静默挂死（见 pitfalls.md）。
-3. Node 依赖 `playwright-core`：`NODE_PATH=$HOME/.workbuddy/binaries/node/workspace/node_modules`。
+3. 社招录用审批脚本：`D:\AI-Workspace\录用意向书\cdp-approval.js`（CDP 版，`--send` 才提交）；旧 `fill-approval-social.js` 是 playwright 版，已停用。

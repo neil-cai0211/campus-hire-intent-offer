@@ -76,7 +76,48 @@ Node 里写 Windows 路径：`'D:\\人力资源部\\...'`。多层转义（shell
 
 ## 三、Chrome / CDP
 
-### ⚠ 登录态是 session cookie —— Chrome 被强杀就会掉登录
+### 🔄 2026-11-13 起：改用 Web Access（CDP Proxy），playwright-core 已卸载
+
+> 下面 9333 / `ChromeCDPGuard` / `start-chrome.sh` 那套**已停用**，仅留作历史参考。
+
+**换方案的原因**：Chrome 自动升级 **156 → 157.0.8103.51**，本机 `playwright-core` 是 **1.56.0**，
+`connectOverCDP` 在 **WebSocket 握手阶段**就被拒（`socket hang up`），Chrome 进程本身活着；
+`launchPersistentContext` 能跑通（管道协议）但**登录态丢失**（Chrome 157 的 Cookies 加密机制变了，
+从旧 profile 拷贝 `Cookies` 文件解不开）。Neil 决定换 `web-access` 技能并卸载 playwright-core
+（包移到 `D:\AI-Workspace\_uninstalled-playwright-20261113`，可恢复）。
+
+**新方案（在用的）**：
+
+| 环节 | 做法 |
+|---|---|
+| 浏览器 | **日常 Chrome 实例**，不用独立 `--user-data-dir` profile ⇒ 登录态天然在，不用扫码 |
+| 开调试 | Chrome 打开 `chrome://inspect/#remote-debugging`，勾选 `Allow remote debugging for this browser instance` ⇒ 自动生成 `%LOCALAPPDATA%\Google\Chrome\User Data\DevToolsActivePort`（本机 9222） |
+| 代理 | `node ~/.workbuddy/skills/web-access/scripts/cdp-proxy.mjs --browser chrome` **常驻**在 `127.0.0.1:3456` |
+| 脚本 | HTTP 调 `/eval?target=<id>`（POST body = JS 表达式）、`/navigate?target=`、`/new`、`/targets`、`/clickAt?target=`、`/health` |
+| 固定偏好 | `~/.workbuddy/skills/web-access/config.env` 设 `WEB_ACCESS_BROWSER=chrome`（否则浏览器发现可能选错） |
+
+工作脚本：`D:\AI-Workspace\录用意向书\cdp-approval.js`
+（默认 dry-run；`--send` 才提交；`CDP_TARGET=<targetId>` 指定标签；旧 `fill-approval-social.js` 是 playwright 版，已停用）。
+
+**这轮踩到的 8 个坑**：
+
+1. **「没看到远程调试开关」往往是页面根本没打开** —— Chrome 当时只有一个别的标签。
+   需新开标签手动导航到 `chrome://inspect/#remote-debugging`，开关就在页面里。
+2. **单次 `/eval` 执行过久会超时** ⇒ 重试循环放 **Node 调用侧**，不要写在页面内的 async 里。
+3. 🔴 **`/eval` 返回空（`PROXY: `）≠ 命令没执行** —— 提交弹窗那步实际已 `btn.click()` 成功、
+   页面已跳回列表，只是响应丢了。此时**必须先读页面状态再决定是否重跑**，
+   否则会重复提交 / 重复发起审批。
+4. **提交审批弹窗的「确定」是 `<button>`，必须原生 `btn.click()`**；
+   `dispatchEvent(new MouseEvent('click'))` 不生效且不报错（旧文档说"不是 button"是错的，那是别的弹窗）。
+5. **合同主体会联动筛选入职部门树** —— 选完主体后树从 7 个一级部门缩到只剩 `CS Dpt.`，
+   「后端 / 研发 / R&D」全搜不到。2026-11-13 Neil 在系统侧改了设置后 `R&D Dpt.` 才出现。
+   ⇒ 遇到部门树缺节点，先刷新到**干净页面**确认是"联动筛选"还是"权限/配置"，别在脏表单上反复试。
+6. **字段 label 带必填星号** ⇒ `item()` 匹配要先 `norm(innerText).replace(/^[*\s：:]+/,"")`，否则全找不到。
+7. **汇报对象是 readonly 员工选择器，不是联想输入框** —— 点开 `.popover-pd`，
+   在里面的搜索框输姓名 → 点 `.tree-item-node` 内的 `.item-wrap`。
+8. **工作城市** `.select-world-city` 的候选项要向上找 `.el-tree-node__content` 祖先再点，直接点文本不落位。
+
+### ⚠ 登录态是 session cookie —— Chrome 被强杀就会掉登录（历史方案 9333）
 薪人薪事的登录 token 是**会话 cookie**（不落盘）。Chrome 进程一旦被**强杀**，
 下次启动就是未登录（跳 `/sso/login`），cookie 里只剩 `XRXSTrackId / aliyungf_tc / zcp / lastAPITime`。
 
