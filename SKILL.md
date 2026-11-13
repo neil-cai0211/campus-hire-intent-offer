@@ -89,7 +89,7 @@ node verify-slots.js
 3. **发送前必须停下**。offer是外发给候选人的，含薪酬数字与合同期。
 4. **只用字符级替换处理带下划线的数字**。技术模板的告知有效期原文「2026年10月23日」与入职日期原文同在文档中，用Find/Replace会串改。
 5. **推送 GitHub 前必须先自检并把「待 Neil 确认」放在最前面**。自检 7 项：脱敏、凭证扫描、私密文件已排除、脱敏后功能仍可用、commit message 有正文、仓库可见性正确、推送后验证远端。详见 [交付前确认与推送规范](references/push-protocol.md)。
-6. **社招录用审批的字段填写顺序是硬约束**。顺序错了不报错，但会跑出残缺表单（薪酬只有 3 个框 / 入职部门被清空 / 提交时字段为空）。**优先用通用脚本** `fill-approval-social.js`（顺序写死在代码里 + 每步自检），别手写。手工填也必须按 reference 里的 12 步顺序，三条最关键：试用期**第一个**填（否则薪酬区不展开成两套）、入职部门**最后**填（否则被联动覆盖）、填表与提交**必须一站式**（草稿不保存，刷新即丢）。详见 [链路一B 社招录用审批](references/workflow-social-approval.md)。
+6. **社招录用审批的字段填写顺序是硬约束**。顺序错了不报错，但会跑出残缺表单（薪酬只有 3 个框 / 入职部门被清空 / 提交时字段为空）。**优先用 CDP 版脚本** `cdp-approval.js`（一人一档 JSON 配置 + 顺序写死 + 12 步自检 + `--resume` 断点续跑），别手写；旧 `fill-approval-social.js` 是 playwright 版，已停用。手工填也必须按 reference 里的 12 步顺序，三条最关键：试用期**第一个**填（否则薪酬区不展开成两套）、入职部门**最后**填（否则被联动覆盖）、填表与提交**必须一站式**（草稿不保存，刷新即丢）。详见 [链路一B 社招录用审批](references/workflow-social-approval.md)。
 7. 🔴 **薪酬口径以「已生成的录用意向书」+ Neil 当时的逐项确认为准，禁止套通用比例**。通用 80/5/15「试用期无绩效」只是缺省值；个案可能是 `试用期 100%（不打折）`，此时试用期三项与转正后完全相同（绩效照填），合计 = 满额；也可能是 `试用期 85%（不发绩效）`，如某社招候选人「满额 × 85% = 基本+保密，绩效填 0」。2026-11-13 某管理序列社招审批就因套用缺省值把试用期合计少填了一档绩效并提交了。**填薪酬前必须先读该候选人意向书配置（`R9C2` 试用期比例 / `R10C2` 满额 / `R13C2-4` 拆分），把比例当显式字段写进配置，并在提交前单独向 Neil 报一次「试用期合计」。** 详见 [链路一B 薪酬章节](references/workflow-social-approval.md)。
 8. 🔴 **合同主体会静默筛掉入职部门树**，填表前先确认目标一级线在该主体白名单内。福州誉龙只放行 `R&D` / `CS`；成都先锋寰宇放行全部 7 条线；**留空也是完整 7 条线**。Neil 2026-11-13 对某社招候选人定过特例口径「无需添加合同」⇒ 合同主体留空提交（label 无必填星号，实测通过）。详见 [链路一B 第 8 条](references/workflow-social-approval.md)。
 
@@ -97,14 +97,14 @@ node verify-slots.js
 
 | 内容 | 路径 |
 |---|---|
-| 工作脚本 | `D:\AI-Workspace\录用意向书\`：**`cdp-approval.js`**（社招录用审批·CDP 版·一人一档 JSON·`--send`/`--resume`）、`wangle-approval.json` 等按人配置、people.js / valid-date.js / gen-intent*.js / send-offer.js / send-all.js / crop-pdf.js。<br>转图用 skill 内 **`scripts/make-insert-pymupdf.py`**；`make-insert-png.js`（playwright）与 `fill-approval-social.js`（playwright）**均已停用** |
+| 工作脚本 | `D:\AI-Workspace\录用意向书\`：**`cdp-approval.js`**（社招录用审批·CDP 版·一人一档 JSON·`--send`/`--resume`）、`<姓名>-approval.json` 等按人配置、people.js / valid-date.js / gen-intent*.js / send-offer.js / send-all.js / crop-pdf.js。<br>转图用 skill 内 **`scripts/make-insert-pymupdf.py`**；`make-insert-png.js`（playwright）与 `fill-approval-social.js`（playwright）**均已停用** |
 | 意向书PDF | `D:\AI-Workspace\录用意向书\out\` |
 | 邮件插图 | `D:\AI-Workspace\录用意向书\out-png\`（3176宽JPEG q=90） |
 | 日志 | `D:\AI-Workspace\录用意向书\logs\` |
 | 模板原件 | `D:\人力资源部文档分类（模板）\01招聘调配\01表格模板\入离调转流程及表单\2-入职\` |
-| Chrome调试实例 | profile `D:\AI-Workspace\cdp-profile`（**必须纯ASCII路径**），端口9333 |
+| 浏览器调试 | **Web Access CDP Proxy**：日常 Chrome 勾选远程调试 → `DevToolsActivePort`(9222) → 代理 `127.0.0.1:3456`；旧 9333 独立实例已停用 |
 
-**Skill只做索引与调度，不搬移工作脚本**——脚本之间有引用链（people.js 被 make-insert-png.js / send-all.js 依赖），搬动会打断。
+**Skill只做索引与调度，不搬移工作脚本**——脚本之间有引用链（people.js 被 send-all.js 等依赖），搬动会打断。
 
 ## 环境前置
 
