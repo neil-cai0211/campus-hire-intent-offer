@@ -475,3 +475,13 @@ python "$HIRE_SKILL_DIR/scripts/make-insert-pymupdf.py" --names "<outName>"
 | 「汇报 VP」 | HR&ADM 线 Leader = `HR&ADM Dpt.(人力行政线) \| VP`，员工选择器搜该负责人姓名 |
 
 职级树/岗位树点**一级叶子文本**才会展开子项，点 `.el-tree-node__expand-icon` 常常无效。
+
+### ⚠ 钉钉提醒称呼别自作主张加「老师」
+
+2026-11-13 第一次沉淀时按中文职场习惯把称呼写成「中文名+老师」，Neil 随即纠正：
+「后续提醒，把老师删掉就叫英文就行了，比如 Ivy」。
+
+⇒ **只叫英文名**（从 EHR 显示名 `中文名(Ivy X)` 取括号里第一个词 `Ivy`），
+不加「老师」、不带姓、不用中文名/简称、不加职务。纯中文显示名取不到英文名就先问 Neil。
+细则见 [钉钉审批提醒环节](dingtalk-approval-reminder.md)。
+教训：称呼是 Neil 的口径，不要按中文职场习惯「礼貌补全」；预览和真发必须同一套文案。

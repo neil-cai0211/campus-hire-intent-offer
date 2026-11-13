@@ -30,6 +30,8 @@ description: 校招录用审批、录用意向书与offer发送助手。用于�
 - **审批提交后提醒审批人（钉钉）** → 读取 [钉钉审批提醒环节](references/dingtalk-approval-reminder.md)
   ⚠ 这是审批链路的**标准最后一步**，校招/社招都适用；收件人取卡片状态里的「当前审批人」。
   🔴 **发送身份是 Neil 本人（`--as user`，带「AI 发送」角标），不是机器人**；发送前必须 `--dry-run` 预览并给 Neil 确认。
+  🔴 **称呼只叫英文名**（Neil 2026-11-13 定）：取显示名 `中文名(Ivy X)` 里的 `Ivy`；
+  **删掉「老师」**，不要中文名/简称、不要带姓、不要职务。取不到英文名先问 Neil。
 - **社招走录用意向书 + offer** → 读取 [链路二B/三B 社招意向书与offer](references/workflow-social-intent-offer.md)
 - **要跑社招 offer 一站式脚本（填表→预览→插图→发送）** → 读取 [社招 offer 一站式脚本](references/workflow-social-offer-onespass.md)
   ⚠ 该文档含**最危险的坑**：预览时可能弹「必审字段被修改，将重新审批offer」——**必须点「取消」**，点「确定」会发起审批导致 offer 发不出去。
