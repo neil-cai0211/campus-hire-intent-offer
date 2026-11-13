@@ -20,7 +20,10 @@ description: 校招录用审批、录用意向书与offer发送助手。用于�
 - **选模板、查字段口径、查某格填什么** → 读取 [模板结构与字段口径](references/templates.md)
 - **生成录用��向书（社招 / 一人一档 / Neil 逐项口述）** → 读取 [链路二C 社招录用意向书](references/workflow-social-intent.md)
   ⚠ 该文档含「要问 Neil 的 11 项」清单、配置 JSON 格式、**管理序列 75/5/20 的比例坑**、留空模式。
-  ⚠ 生成后**必须裁图核验**（脚本报成功 ≠ 内容对）。
+  🔴 **提问方式（Neil 2026-11-13 明确偏好）**：连着不间断地**选项式**问，一次 3–4 题用 `AskUserQuestion` 点选，
+  一批答完立刻接下一批；**不要一次性列文字清单让 Neil 打字填**，也不要一题一答中间插探查。
+  试用期收入比例必须单独一题，不可与拆分比例合并。
+  ⚠ 生成后**必须裁四段图核验**（脚本报成功 ≠ 内容对）。
 - **提交录用审批（校招）** → 读取 [链路一 录用审批](references/workflow-approval.md)
 - **提交录用审批（社招 / 无需用人部门筛选）** → 读取 [链路一B 社招录用审批](references/workflow-social-approval.md)
   ⚠ 该文档开头的「填写顺序」章节是**必读**，字段之间有依赖，顺序错了不报错但会跑出残缺表单。
@@ -87,13 +90,14 @@ node verify-slots.js
 4. **只用字符级替换处理带下划线的数字**。技术模板的告知有效期原文「2026年10月23日」与入职日期原文同在文档中，用Find/Replace会串改。
 5. **推送 GitHub 前必须先自检并把「待 Neil 确认」放在最前面**。自检 7 项：脱敏、凭证扫描、私密文件已排除、脱敏后功能仍可用、commit message 有正文、仓库可见性正确、推送后验证远端。详见 [交付前确认与推送规范](references/push-protocol.md)。
 6. **社招录用审批的字段填写顺序是硬约束**。顺序错了不报错，但会跑出残缺表单（薪酬只有 3 个框 / 入职部门被清空 / 提交时字段为空）。**优先用通用脚本** `fill-approval-social.js`（顺序写死在代码里 + 每步自检），别手写。手工填也必须按 reference 里的 12 步顺序，三条最关键：试用期**第一个**填（否则薪酬区不展开成两套）、入职部门**最后**填（否则被联动覆盖）、填表与提交**必须一站式**（草稿不保存，刷新即丢）。详见 [链路一B 社招录用审批](references/workflow-social-approval.md)。
-7. 🔴 **薪酬口径以「已生成的录用意向书」+ Neil 当时的逐项确认为准，禁止套通用比例**。通用 80/5/15「试用期无绩效」只是缺省值；个案可能是 `试用期 100%（不打折）`，此时试用期三项与转正后完全相同（绩效照填），合计 = 满额。2026-11-13 某管理序列社招审批就因套用缺省值把试用期合计少填了一档绩效并提交了。**填薪酬前必须先读该候选人意向书配置（`R9C2` 试用期比例 / `R10C2` 满额 / `R13C2-4` 拆分），把比例当显式字段写进配置，并在提交前单独向 Neil 报一次「试用期合计」。** 详见 [链路一B 薪酬章节](references/workflow-social-approval.md)。
+7. 🔴 **薪酬口径以「已生成的录用意向书」+ Neil 当时的逐项确认为准，禁止套通用比例**。通用 80/5/15「试用期无绩效」只是缺省值；个案可能是 `试用期 100%（不打折）`，此时试用期三项与转正后完全相同（绩效照填），合计 = 满额；也可能是 `试用期 85%（不发绩效）`，如某社招候选人「满额 × 85% = 基本+保密，绩效填 0」。2026-11-13 某管理序列社招审批就因套用缺省值把试用期合计少填了一档绩效并提交了。**填薪酬前必须先读该候选人意向书配置（`R9C2` 试用期比例 / `R10C2` 满额 / `R13C2-4` 拆分），把比例当显式字段写进配置，并在提交前单独向 Neil 报一次「试用期合计」。** 详见 [链路一B 薪酬章节](references/workflow-social-approval.md)。
+8. 🔴 **合同主体会静默筛掉入职部门树**，填表前先确认目标一级线在该主体白名单内。福州誉龙只放行 `R&D` / `CS`；成都先锋寰宇放行全部 7 条线；**留空也是完整 7 条线**。Neil 2026-11-13 对某社招候选人定过特例口径「无需添加合同」⇒ 合同主体留空提交（label 无必填星号，实测通过）。详见 [链路一B 第 8 条](references/workflow-social-approval.md)。
 
 ## 执行位置
 
 | 内容 | 路径 |
 |---|---|
-| 工作脚本 | `D:\AI-Workspace\录用意向书\`（people.js / valid-date.js / gen-intent*.js / send-offer.js / send-all.js / make-insert-png.js / crop-pdf.js / **fill-approval-social.js**（社招录用审批·参数化·顺序内置自检）） |
+| 工作脚本 | `D:\AI-Workspace\录用意向书\`：**`cdp-approval.js`**（社招录用审批·CDP 版·一人一档 JSON·`--send`/`--resume`）、`wangle-approval.json` 等按人配置、people.js / valid-date.js / gen-intent*.js / send-offer.js / send-all.js / crop-pdf.js。<br>转图用 skill 内 **`scripts/make-insert-pymupdf.py`**；`make-insert-png.js`（playwright）与 `fill-approval-social.js`（playwright）**均已停用** |
 | 意向书PDF | `D:\AI-Workspace\录用意向书\out\` |
 | 邮件插图 | `D:\AI-Workspace\录用意向书\out-png\`（3176宽JPEG q=90） |
 | 日志 | `D:\AI-Workspace\录用意向书\logs\` |
@@ -112,4 +116,9 @@ node verify-slots.js
    - ⚠ `/eval` 返回空不等于没执行，重跑前先读页面状态（详见 [踩坑 三](references/pitfalls.md)）
    - 旧的 `start-chrome.sh` / `ChromeCDPGuard` / 9333 端口方案**已停用**
 2. Word COM 可用。生成意向书前先清掉残留WINWORD进程与Word恢复记录，否则 `Documents.Open` 会静默挂死（见 pitfalls.md）。
-3. 社招录用审批脚本：`D:\AI-Workspace\录用意向书\cdp-approval.js`（CDP 版，`--send` 才提交）；旧 `fill-approval-social.js` 是 playwright 版，已停用。
+3. 社招录用审批脚本：`D:\AI-Workspace\录用意向书\cdp-approval.js`（CDP 版，`--send` 才提交）：
+   - **一人一档**：`CDP_CONFIG=<绝对路径>/<姓名>-approval.json`，薪酬六项与试用期比例逐人显式写，禁止套通用值；
+   - `--resume --send`：`/eval` 报超时后从断点继续（超时 ≠ 没执行，先读回快照）；
+   - 旧 `fill-approval-social.js`（playwright 版）已停用。
+4. **PDF → 插图**用 `python scripts/make-insert-pymupdf.py --names "<outName>"`（PyMuPDF 2.0 + Pillow，本机已装）。
+   旧 `make-insert-png.js` 依赖已卸载的 playwright-core 与 cdnjs，**不要再用**。

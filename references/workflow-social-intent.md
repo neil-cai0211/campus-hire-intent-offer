@@ -16,7 +16,13 @@
 ## 标准流程
 
 ```
-1. 一次性把「要问 Neil 的项」列成清单 → 逐项问（每次问 1 项，或用 AskUserQuestion 分组）
+1. **连着不间断地「选项式」提问**（Neil 2026-11-13 明确偏好，别再改回去）：
+   - 一次用 `AskUserQuestion` 给 **3–4 题**，每题都是可点选的选项（带「推荐」+ 自定义输入）；
+   - 一批答完**立刻接下一批**，中间不插系统探查、不插长篇说明、不等待；
+   - 11 项拆两批：`①汇报职级 ②汇报对象 ③职级 ④转正薪酬` → `⑤拆分比例 ⑥试用期比例 ⑦月数+入职日 ⑧有效期`。
+   - 🚫 **不要**「一次性把 11 项列成文字清单让 Neil 自己打字填」——Neil 明确说「不喜欢全部写进去」；
+   - 🚫 **也不要**一题一答中间夹大段组织架构探查（会被嫌慢）。系统侧核对放在开问**之前**或全部答完**之后**。
+   - ⚠ 第 ⑥ 项「试用期收入比例」必须**单独一题**、不可与拆分比例合并：2026-11-13 陆贤平事故就出在套了通用 85%。
 2. 收到全部项 → 组装 JSON 配置
 3. 跑 gen-intent.js 生成 PDF
 4. 跑 make-insert-png.js 生成图片
@@ -193,11 +199,34 @@ node scripts/gen-intent.js '<配置JSON>'
 ## 产出
 
 - `out/<outName>.pdf`
-- `out-png/<outName>.jpg`（3176 宽，pdf.js scale=12 渲染，q=90，约 1.8MB）
+- `out-png/<outName>.jpg`（3176 宽 JPEG，q=90，约 1.8MB）
 
 ```bash
-node scripts/make-insert-png.js --names "<outName>"
+# ✅ 现行方案：PyMuPDF 直接渲染，不依赖浏览器 / playwright / 网络
+python "$HIRE_SKILL_DIR/scripts/make-insert-pymupdf.py" --names "<outName>"
 ```
+
+⚠ `make-insert-png.js`（playwright 版）**已停用**：2026-11-13 playwright-core 卸载后
+`require('playwright-core')` 直接失败，且旧脚本还要从 cdnjs 拉 pdf.js。
+新脚本用 PyMuPDF 2.0 + Pillow，同一输出规格，纯本地。
+
+### 生成后必须裁图核验（四段，不能只看日志）
+
+```python
+from PIL import Image
+im = Image.open(r'D:\AI-Workspace\录用意向书\out-png\<outName>.jpg')
+w, h = im.size
+for name, (a, b) in {
+    'a-抬头': (0.00, 0.20), 'b-日期试用期': (0.18, 0.46),
+    'c-薪酬': (0.44, 0.74), 'd-有效期': (0.72, 1.00),
+}.items():
+    c = im.crop((0, int(h*a), w, int(h*b)))
+    c.thumbnail((1500, 1500))
+    c.save(r'D:\AI-Workspace\<work>\chk-' + name + '.png')
+```
+
+四段逐一用 ViewImage 看：①称呼/职位/部门/汇报上级 ②入职日/合同期/试用期/比例
+③满额与三项金额+百分比文字 ④告知有效期。**这四处错了都不报错**。
 
 ## 技术支持组（已确认口径）
 

@@ -344,4 +344,48 @@ Element UI 的 `el-select-dropdown__item`：
 按 `fullPath` 逐级展开时，用**括号前的英文名做宽松匹配**（取文本最短的候选），
 不要用全段精确匹配 —— 实测 `Implementation(远程实施部)` 这种带括号的段会匹配失败。
 
+### 8. ⚠⚠ 合同主体决定「入职部门树」的可见范围（静默筛选）
+
+选完合同主体，部门树会被筛成该主体授权的部门，**不报错、不提示**：
+
+| 合同主体 | 部门树一级节点 |
+|---|---|
+| 福州誉龙智能科技有限公司 | 仅 `R&D Dpt.`、`CS Dpt.` |
+| 成都先锋寰宇科技有限公司 | 完整 7 条线 |
+| **留空** | 完整 7 条线 |
+
+- 2026-11-03：Neil 在后台给福州誉龙放行 R&D，陆贤平的「后端组」才可选。
+- 2026-11-13：某社招候选人要 `HR&ADM Dpt.(人力行政线)` → `CN 人力资源部`，福州誉龙未放行，
+  树里根本没有 HR 线。Neil 定口径「这个特例，无需添加合同」⇒ **合同主体留空**提交
+  （配置 `subject: ""`，label 无必填星号，实测提交成功、卡片「审批中」）。
+- ⇒ 填表前先确认目标一级线是否在白名单内；不在就留空 / 换主体 / 请 Neil 后台放行。
+  step5 已改成 `if (CFG.subject)` 可跳过；step12 校验会忽略空值项。
+
+### 9. CDP 版脚本：`cdp-approval.js` 配置驱动 + 断点续跑
+
+```bash
+CDP_CONFIG="D:/AI-Workspace/录用意向书/wangle-approval.json" \
+  node cdp-approval.js            # dry-run（填表 + 12 步校验，不提交）
+node cdp-approval.js --send       # 校验通过才提交
+node cdp-approval.js --resume --send   # /eval 超时后从断点继续
+```
+
+- **一人一档 JSON**：`pay` 六项、`sumProbation` / `sumFull`、`probRatio` 必须逐人显式写，
+  禁止套通用比例或复用上一个人的值（2026-11-13 陆贤平事故的根因）。
+  配置里用 `_intentRef` / `_intentProbRatio` 记录与意向书的交叉核对依据。
+- `--resume`：超时 ≠ 失败（30s 超时时字段常已写入）。先读回快照，
+  再用 `--resume` 跳过 navigate 与 step1-9，脚本会做「9R 薪酬逐项复核」再走 step10-12。
+- 部门路径 `deptPath` 参数化（数组，最后一项是叶子），不再硬编码 R&D 那条线。
+- 提交弹窗「确定」用 `btn.click()` 原生调用，`dispatchEvent(MouseEvent)` 不生效。
+
+### 10. 岗位/职级树：Neil 的叫法 ≠ 系统节点名
+
+| Neil 口径 | 系统实际 |
+|---|---|
+| 「职能序列-P1」 | 职级树 `专业序列-P` → `P1` |
+| 初级招聘专员 | 岗位树 `职能` 分类下 |
+| 汇报 VP（HR 线） | HR&ADM 线 Leader，`HR&ADM Dpt. \| VP` |
+
+点**一级叶子文本**才展开子项，点 `.el-tree-node__expand-icon` 常常无效。
+
 
