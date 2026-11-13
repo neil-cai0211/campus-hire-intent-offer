@@ -99,7 +99,7 @@ node verify-slots.js
 
 | 内容 | 路径 |
 |---|---|
-| 工作脚本 | `D:\AI-Workspace\录用意向书\`：**`cdp-approval.js`**（社招录用审批·CDP 版·一人一档 JSON·`--send`/`--resume`）、`<姓名>-approval.json` 等按人配置、people.js / valid-date.js / gen-intent*.js / send-offer.js / send-all.js / crop-pdf.js。<br>转图用 skill 内 **`scripts/make-insert-pymupdf.py`**；`make-insert-png.js`（playwright）与 `fill-approval-social.js`（playwright）**均已停用** |
+| 工作脚本 | `D:\AI-Workspace\录用意向书\`：**`cdp-approval.js`**（社招录用审批·CDP 版）、**`cdp-offer-social.js`**（社招 offer·CDP 版·`--send`／`--resume`，配套 `cdp-lib.js` + `cdp-offer-helpers.js`），一人一档 `<姓名>-approval.json` / `<姓名>-offer.json`；people.js / valid-date.js / gen-intent*.js / crop-pdf.js。<br>转图用 skill 内 **`scripts/make-insert-pymupdf.py`**。<br>🔴 **playwright 版全部停用**（2026-11-13 卸载 playwright-core）：`offer-onepass-social.js` 只作业务底本参考、`make-insert-png.js` / `fill-approval-social.js` / `send-offer.js` / `send-all.js` 不再可直接运行 |
 | 意向书PDF | `D:\AI-Workspace\录用意向书\out\` |
 | 邮件插图 | `D:\AI-Workspace\录用意向书\out-png\`（3176宽JPEG q=90） |
 | 日志 | `D:\AI-Workspace\录用意向书\logs\` |

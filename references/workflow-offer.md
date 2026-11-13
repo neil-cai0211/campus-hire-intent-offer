@@ -1,5 +1,10 @@
 # 链路三 · offer 发送
 
+> ⚠ **本文档是校招/playwright 时代的操作记录，命令已不可直接执行**（2026-11-13 卸载 playwright-core）。
+> 现行社招 offer 走 `cdp-offer-social.js`，见 [社招 offer 一站式脚本（CDP 版）](workflow-social-offer-onespass.md) 开头章节。
+> 下面的 DOM 坑点与**产出判据**仍然有效，但判据以「详情页 offer 记录区待确认 + 到期时间 + 发起时间」为准，
+> 不能只看按钮变「重发Offer」。
+
 **目的**：改 offer 表单字段、插入意向书图、发送。
 **产出判据**：卡片按钮从「发送Offer」变为「**重发Offer**」，流程阶段进入 offer。
 

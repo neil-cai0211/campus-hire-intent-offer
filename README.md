@@ -44,7 +44,8 @@ cp config.local.example.js config.local.js   # 填入真实值
 # 编辑 config.js 的 TEMPLATE_DIR / WORKSPACE，或设环境变量
 ```
 
-依赖：Word COM（生成意向书）、Chrome CDP 9333（跑 offer 链路）、Node + playwright-core。
+依赖：Word COM（生成意向书）、**Web Access CDP Proxy 127.0.0.1:3456 + 日常 Chrome 9222**（跑审批/offer 链路）、Python（PyMuPDF + Pillow 转图）。
+⚠ 2026-11-13 起 **playwright-core 已卸载、独立 9333 实例停用**；`scripts/` 下所有 playwright 版脚本（`offer-onepass-social.js`、`send-offer*.js`、`fill-approval-social.js`、`make-insert-png.js`）仅作历史底本，不要直接执行。现行脚本在工作区 `D:\AI-Workspace\录用意向书\cdp-*.js`。
 
 ## 模板不复制
 

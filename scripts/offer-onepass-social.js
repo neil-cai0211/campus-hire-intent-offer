@@ -1,3 +1,6 @@
+// ⛔ 已停用（2026-11-13）：playwright-core 卸载 + 9333 独立实例停用，本脚本不可直接运行。
+//    仅作业务顺序/坑点的底本参考；现行版本是工作区 D:\AI-Workspace\录用意向书\cdp-offer-social.js。
+//    见 references/workflow-social-offer-onespass.md 开头「当前唯一可执行版本 = CDP 版」。
 // 一站式：填 offer 表单 → 选模板 → 插图 → 发送
 // ⚠ 草稿不保存 ⇒ 必须同一次会话内跑完，中间不能 goto/reload。
 // 用法: node offer-onepass-social.js <配置.json> [--send]

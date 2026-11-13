@@ -1,7 +1,57 @@
-# 链路二B-补 · 社招 offer 一站式脚本（offer-onepass-social.js）
+# 链路二B-补 · 社招 offer 一站式脚本
 
-> 2026-11-03 实战沉淀。某社招候选人（初级技术支持专员 / 技术支持组 / S1 / 试用期 6 个月 / 邮箱中途被改过）
+> 2026-11-03 实战沉淀（playwright 版），2026-11-13 改版为 **CDP 版**并实战跑通。
 > 一次跑通：填表 → 校验 → 预览 → 选模板 → 插图 → 校验正文 → 发送 → 确认。
+
+## 🔴 当前唯一可执行版本 = CDP 版（2026-11-13 起）
+
+`playwright-core` 已卸载；Chrome 157 与 `playwright-core 1.56.0` 的 `connectOverCDP` 不兼容。
+**下面的 `offer-onepass-social.js` 章节全部只作为业务顺序与坑点的底本参考，不要直接执行。**
+
+```bash
+cd "D:/AI-Workspace/录用意向书"
+# 前置：日常 Chrome 已勾选 chrome://inspect 远程调试（9222），CDP Proxy 常驻 127.0.0.1:3456
+CDP_CONFIG="D:/AI-Workspace/录用意向书/<姓名>-offer.json" node cdp-offer-social.js           # dry-run：校验 + 抄送，停发送前
+CDP_CONFIG="D:/AI-Workspace/录用意向书/<姓名>-offer.json" node cdp-offer-social.js --send    # 全流程 + 发送
+```
+
+- 配置一人一档 `<姓名>-offer.json`（字段见下方「CDP 版配置」）；`target` 是候选人详情页的 CDP targetId。
+- **dry-run 只做只读校验 + 抄送落位，不预览不插图不发送**；字段快照给 Neil 确认后才跑 `--send`。
+- `--send` 会**重新导航**从零跑全流程（草稿不保存，所以 dry-run 与 send 互不依赖，安全）。
+- 页面内 helper 拆到 `cdp-offer-helpers.js`（独立文件便于 `node --check` 语法校验），
+  经 `POST /eval?target=` 注入；坐标点击走 `/clickAt`，文件上传走 `/setFiles`。
+
+### CDP 版配置（与旧版差异）
+
+```json
+{
+  "name": "<姓名>", "resumeId": "<32位hex>", "target": "<CDP targetId>",
+  "position": "<入职岗位>", "rank": "<职级>", "rankSeq": "<职级序列>", "jobCat": "<岗位类别>",
+  "deptPath": ["<一级线>", "<二级>", "<三级>"],
+  "onboardDate": "YYYY/MM/DD", "regularDate": "YYYY/MM/DD", "probationMonths": 6,
+  "subject": "", "leader": "<汇报对象姓名>", "cityProvince": "<省>", "city": "<市>",
+  "pay": { "prob": {"basic":0,"secret":0,"perf":0}, "full": {"basic":0,"secret":0,"perf":0} },
+  "sumProbation": 0, "sumFull": 0, "offerValidDays": 3,
+  "img": "<意向书插图 jpg 绝对路径>", "mailTemplate": "正式员工 - 福州"
+}
+```
+
+- `subject: ""` = 合同主体留空（Neil 的「无需添加合同」特例）；**offer 表单若已继承留空，不要补填**。
+- `pay` / `sumProbation` / `sumFull` 必须取**该候选人录用意向书**的口径，禁止套通用比例。
+- CDP 版**不改任何必审字段**：表单值全部由录用审批继承，脚本只读比对；不一致直接 `bail` 中止。
+
+### CDP 版相对旧版修掉的隐患
+
+1. 旧脚本预览弹窗**无脑点「确定」** ⇒ 遇到「必审字段被修改，将重新审批offer」会误发起新一轮审批。
+   CDP 版检测该文案 ⇒ **点「取消」并中止发送**（预览、发送确认两处都拦）。
+2. 旧脚本发送后依赖页面内 helper 读回；**发送成功会跳转到 `/recruitment/detail`、helper 被整体卸载**，
+   `/eval` 抛 `Uncaught` 被误报成 FATAL。CDP 版收尾用 `safeE` 容错，并改用**不依赖 helper** 的三重判据
+   （卡片「offer待确认」+「重发Offer」、记录区「待确认-N/N到期」、发起时间/发件人）。
+3. 抄送邮箱 `el-select` 是**远程联想**：直接改 value + 一次 input 不触发搜索，见下方新增坑点。
+
+> 实测（2026-11-13 社招候选人）：审批通过后 dry-run 全绿 → `--send` 一次跑通，
+> 插图 `imgCount=2`、正文社招条款齐全、无「同学」字样；详情页记录区「待确认-11/15到期」，
+> 与意向书有效期交叉验证一致。
 
 ## 为什么需要一站式脚本
 

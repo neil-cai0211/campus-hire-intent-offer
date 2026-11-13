@@ -485,3 +485,54 @@ python "$HIRE_SKILL_DIR/scripts/make-insert-pymupdf.py" --names "<outName>"
 不加「老师」、不带姓、不用中文名/简称、不加职务。纯中文显示名取不到英文名就先问 Neil。
 细则见 [钉钉审批提醒环节](dingtalk-approval-reminder.md)。
 教训：称呼是 Neil 的口径，不要按中文职场习惯「礼貌补全」；预览和真发必须同一套文案。
+
+## 九、2026-11-13 社招 offer CDP 版实战（playwright → Web Access 迁移）
+
+### ① 旧 offer 脚本不能直接改依赖，要按「底本 + 换驱动层」整理
+
+`offer-onepass-social.js` 是 playwright 版，连 9333 独立 Chrome 实例；playwright-core 卸载后整条链路失效。
+✅ 正解（Neil 口径「脚本可以基于以前的重新整理，我们的skill已经换了」）：
+**业务顺序/校验逻辑全部保留，只把浏览器驱动换成 Web Access CDP Proxy**（`/eval`、`/clickAt`、
+`/navigate`、`/setFiles`、`/targets`，端口 3456，日常 Chrome 9222）。
+产出 `cdp-offer-social.js` + `cdp-lib.js` + `cdp-offer-helpers.js`。
+
+### ② 页面内 helper 要独立成文件
+
+第一次把 helper 写在主脚本的数组里拼字符串，括号不匹配 ⇒ `/eval` 只回 `Uncaught`，看不到行号。
+✅ 拆成 `cdp-offer-helpers.js`，主脚本 `fs.readFileSync` 注入，可先 `node --check` 校验语法。
+
+### ③ 抄送邮箱远程联想：三个连着的坑
+
+`el-select` 的抄送人联想必须逐字符派发 `keydown → native setter → InputEvent → keyup`，
+直接改 value + 一次 input **不触发远程搜索**。另外：
+
+| 坑 | 现象 | 解法 |
+|---|---|---|
+| 逐字符时读 `inp.value + ch` 再写回 | Vue 异步更新把值打乱成「首尾字符重复 + 乱序」（如 `XYZ` → `ZXYZ`），远程搜索返回「无数据」 | 自己维护累加缓冲 `buf`，每轮写完整 `buf` |
+| 联想轮询写在页面内 `await` 循环 | 单次 `/eval` 超过 30s 超时 | 轮询放 **Node 侧**，每次只做一次短 `/eval` |
+| 用 `height>4` 过滤 `.el-select-dropdown__item` | 下拉展开 300ms 动画中高度为 0，已返回的选项被全滤掉，误判「未匹配」 | **不按尺寸过滤**，按文本匹配后用**原生 `el.click()`** 选中（动画中坐标点击会落空） |
+
+### ④ `/clickAt` 与原生 `click()` 各有适用面
+
+普通按钮/下拉用 `/clickAt`（真实鼠标，能触发 Vue 下拉）；
+**动画中高度 0 的联想项、提交弹窗「确定」**用元素原生 `btn.click()`，坐标点击会落空。
+
+### ⑤ 插图上传走 `/setFiles`，不要找 filechooser
+
+「修改邮件」→ 把光标放到编辑器末尾 → 点图片按钮 → 弹「图片上传」→
+给弹窗里的 `input[type=file]` 打 `data-cdp-file="1"` →
+`POST /setFiles?target=` body `{"selector":"input[type=file][data-cdp-file=\"1\"]","files":["<绝对路径>"]}`。
+回执 `{"success":true,"files":1}`；等 9s 后正文 `imgCount` 应为 **2**（模板水印图 + 意向书）。
+
+### ⑥ 🔴 发送成功会跳页并卸载 helper，别误报 FATAL
+
+点完「确定发送offer吗?」的「确定」后，SPA 跳到 `/recruitment/detail`，
+`window.__O` 整个消失；收尾若继续 `window.__O.dialogs()` ⇒ `/eval` 抛 `Uncaught` ⇒ 脚本打 `FATAL`。
+**实测这次 offer 其实已经发出去了**（详情页卡片「offer待确认」、记录区「待确认-11/15到期」）。
+✅ 收尾一律用 `safeE(expr, fallback)` 容错，且核验表达式**不依赖 helper**，只读 `document.body.innerText`。
+
+### ⑦ 任何「成功/失败」结论都要用三重判据，不要看脚本退出码
+
+`发送动作已执行` ≠ 发送成功；脚本 `FATAL` ≠ 发送失败。
+唯一判据仍是详情页：**卡片「offer待确认」/「重发Offer」+ 记录区「待确认-N/N到期」+ 发起时间/发件人**。
+到期时间还要与意向书「本通知书有效日期至」交叉验证。
