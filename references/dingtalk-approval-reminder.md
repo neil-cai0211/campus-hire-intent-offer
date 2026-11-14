@@ -83,7 +83,7 @@ dws chat message query-send-status --open-task-id "<openTaskId>"
 
 | 坑 | 说明 |
 |---|---|
-| 🔴 **必须 `--as user`（默认身份）** | 用机器人会显示成「Neil的机器人」，Neil 不要这个；`--as bot`、`send-by-bot`、`+messages-send --as bot` 一律别用 |
+| 🔴 **必须 `--as user`（默认身份）** | 用机器人会显示成机器人名称而不是本人，Neil 不要这个；`--as bot`、`send-by-bot`、`+messages-send --as bot` 一律别用 |
 | **AI 发送角标** | `--ai-tag` 默认 true ⇒ 消息带「AI 发送」标记，这正是 Neil 要的效果，**别关掉** |
 | user 单聊用 `--user`（userId）或 `--open-dingtalk-id` | `--users` / `--open-dingtalk-ids` 是 bot 批量参数，user 传了会报错 |
 | `userId` ≠ `openDingTalkId` | 通讯录两个字段都在，别拿错 |
@@ -94,7 +94,7 @@ dws chat message query-send-status --open-task-id "<openTaskId>"
 
 ## 前置环境
 
-- `dws` CLI：`C:\Users\huiji\bin\dws.exe`（已在用户 PATH）
-- profile：ZBS POS CORP / 蔡宇航(Neil Cai)，用 `dws profile list` 确认
-- 本机 PATH 顺序：`.sandbox-bin` → `C:\Users\huiji\bin` → 托管 Node 目录最后
+- `dws` CLI：`$HOME/bin/dws.exe`（稳定副本，已在用户 PATH；`$HOME` = 本机用户目录）
+- profile：`<企业组织名> / <Neil 本人账号>`，用 `dws profile list` 确认
+- 本机 PATH 顺序：`$CODEX_HOME/.sandbox-bin` → `$HOME/bin` → 托管 Node 目录最后
   （Node 目录里有 `dws.ps1`，PowerShell 会优先选它并被策略拦）
