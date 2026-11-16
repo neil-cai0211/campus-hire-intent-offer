@@ -102,6 +102,7 @@ node verify-slots.js
 | 工作脚本 | `D:\AI-Workspace\录用意向书\`：**`cdp-approval.js`**（社招录用审批·CDP 版）、**`cdp-offer-social.js`**（社招 offer·CDP 版·`--send`／`--resume`，配套 `cdp-lib.js` + `cdp-offer-helpers.js`），一人一档 `<姓名>-approval.json` / `<姓名>-offer.json`；people.js / valid-date.js / gen-intent*.js / crop-pdf.js。<br>转图用 skill 内 **`scripts/make-insert-pymupdf.py`**。<br>🔴 **playwright 版全部停用**（2026-11-13 卸载 playwright-core）：`offer-onepass-social.js` 只作业务底本参考、`make-insert-png.js` / `fill-approval-social.js` / `send-offer.js` / `send-all.js` 不再可直接运行 |
 | 意向书PDF | `D:\AI-Workspace\录用意向书\out\` |
 | 邮件插图 | `D:\AI-Workspace\录用意向书\out-png\`（3176宽JPEG q=90） |
+| 纸质打印 | 打印脚本 `D:\AI-Workspace\print_letter.py`（pywin32 + Pillow GDI，`COPIES` 控制份数）；流程与判据见 [pitfalls 第十章](references/pitfalls.md)。⚠ 别用 PowerShell `Add-Type` 打 .NET 打印，沙箱会拦 |
 | 日志 | `D:\AI-Workspace\录用意向书\logs\` |
 | 模板原件 | `D:\人力资源部文档分类（模板）\01招聘调配\01表格模板\入离调转流程及表单\2-入职\` |
 | 浏览器调试 | **Web Access CDP Proxy**：日常 Chrome 勾选远程调试 → `DevToolsActivePort`(9222) → 代理 `127.0.0.1:3456`；旧 9333 独立实例已停用 |

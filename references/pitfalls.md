@@ -536,3 +536,47 @@ python "$HIRE_SKILL_DIR/scripts/make-insert-pymupdf.py" --names "<outName>"
 `发送动作已执行` ≠ 发送成功；脚本 `FATAL` ≠ 发送失败。
 唯一判据仍是详情页：**卡片「offer待确认」/「重发Offer」+ 记录区「待确认-N/N到期」+ 发起时间/发件人**。
 到期时间还要与意向书「本通知书有效日期至」交叉验证。
+
+## 十、2026-11-16 打印纸质录用意向书（多份）
+
+### 🔴 PowerShell 里 .NET 动态编译/加载全被沙箱拦
+
+`Add-Type`（连 `Add-Type -AssemblyName System.Drawing` 这种纯加载也算）和
+`[System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")` 会被安全策略直接拒绝：
+
+```
+Command blocked for security: Add-Type compiles and loads .NET code at runtime
+Command blocked for security: Reflection.Assembly load APIs execute arbitrary .NET code
+```
+
+⇒ 别在 `.NET PrintDocument` 这条路上反复试错。
+
+### ✅ 正解：pywin32 + Pillow `ImageWin.Dib` 直接打 GDI
+
+本机 managed Python 已带 `win32print` / `win32ui` / `Pillow`，零安装、零弹窗、份数可控。
+
+1. PDF → 300 DPI PNG：`pymupdf` `page.get_pixmap(dpi=300, alpha=False)`（A4 = 2480×3508）。
+2. **图片路径必须是纯 ASCII**（复制到 `$TEMP\xxx.png`）；Windows 路径含中文时 PowerShell/脚本易乱码。
+3. `win32ui.CreateDC()` → `CreatePrinterDC(win32print.GetDefaultPrinter())` → `StartDoc`。
+4. 取 `HORZRES/VERTRES`（可打印区像素）与 `PHYSICALOFFSETX/Y`，**等比缩放居中**画到该区域，
+   不要直接画满整页 —— 打印机有不可打印边距，会裁掉页眉/页脚。
+5. `ImageWin.Dib(img).draw(dc.GetHandleOutput(), (x, y, x+w, y+h))`。
+6. **要 N 份就 `StartPage/EndPage` 循环 N 次**（同一作业连续 N 张纸，比改 DEVMODE 的
+   `dmCopies` 稳，pywin32 的 DEVMODE 属性名不保证）。
+7. `EndDoc` → `DeleteDC`。
+
+工作脚本：`D:\AI-Workspace\print_letter.py`（常量 `PNG` / `COPIES` / `TITLE`）。
+
+### 判据：看打印队列，别只看脚本退出码
+
+`Get-PrintJob -PrinterName "<打印机名>"` 应出现
+`name=<TITLE> | pages=N | status=Complete`（本机是 `Complete, Retained`，驱动设了保留已打印作业）。
+
+⚠ **软件只能证明作业已送到打印机**；是否真的出纸、有没有卡纸/缺纸，必须现场确认。
+汇报时要写清这一层，不要说「已打印完成」当成实物已产出。
+
+### 打印前先核对有效期
+
+意向书上的「本通知书有效日期至」是**回复期限**，会过期。
+打印当天若已过该日期（例：11/15 到期、11/16 才打印用于入职签字存档），
+要主动提示 Neil 是否需要按新日期重出一版，别默认原文件仍有效。
